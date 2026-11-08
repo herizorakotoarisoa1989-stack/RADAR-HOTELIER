@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Hôtelier — Scanner de fuites de revenus</title>
+<style>
+:root{--navy:#0F1F38;--deep:#0A1526;--gold:#C19A4B;--gold-soft:#E6D3A6;--paper:#F3F4F7;--ink:#1A2233;--mute:#5E6A80;--line:#DDE1EA;--red:#B3382C;--amber:#B8741A;--green:#2E7D5B;--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%}
+button,select,input{font:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px}
+.hero{background:var(--deep);color:#fff;padding:28px 0 40px}
+.brand{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:34px}
+.brand b{font-family:var(--serif);font-size:20px;color:var(--gold);letter-spacing:.3px}
+.brand span{font-size:13px;color:#9AA7BF}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,6vw,46px);line-height:1.1;max-width:18em}
+.sub{color:#B7C2D6;margin-top:12px;max-width:34em}
+.drop{margin-top:26px;border:1.5px dashed #56688A;border-radius:14px;padding:26px 18px;text-align:center;background:#0E1D34;cursor:pointer;transition:border-color .2s,background .2s}
+.drop.over,.drop:hover{border-color:var(--gold);background:#12253F}
+.drop strong{display:block;font-size:17px}
+.drop small{color:#9AA7BF}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;align-items:end}
+.btn{border:0;border-radius:10px;padding:12px 18px;font-weight:600;cursor:pointer;min-height:44px}
+.btn.gold{background:var(--gold);color:#1A1405}
+.btn.ghost{background:transparent;color:#fff;border:1px solid #56688A}
+.btn.navy{background:var(--navy);color:#fff}
+.btn.line{background:#fff;border:1px solid var(--line);color:var(--ink)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#B7C2D6}
+label.f input{background:#0E1D34;border:1px solid #3A4C6C;color:#fff;border-radius:8px;padding:10px 12px;min-height:44px;width:170px}
+.loss{margin-top:6px}
+.loss .big{font-family:var(--serif);font-size:clamp(40px,11vw,78px);color:var(--gold);line-height:1}
+.loss p{color:#B7C2D6;margin-top:8px}
+.score{display:inline-flex;align-items:baseline;gap:8px;margin-top:18px;background:#12253F;border-radius:999px;padding:8px 16px}
+.score b{font-family:var(--serif);font-size:26px}
+main{padding:26px 0 70px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi small{color:var(--mute);font-size:13px}
+.kpi b{display:block;font-family:var(--serif);font-size:24px;color:var(--navy);margin-top:2px}
+section.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:18px}
+h2{font-family:var(--serif);font-weight:600;font-size:21px;color:var(--navy);margin-bottom:12px}
+.an{display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line)}
+.an:first-of-type{border-top:0}
+.tag{font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;align-self:start;white-space:nowrap}
+.t-critique{background:#F8E1DD;color:var(--red)}.t-majeure{background:#F7E8D2;color:var(--amber)}.t-mineure{background:#E4ECF5;color:#3A5A86}
+.an .ti{font-weight:600}.an .de{grid-column:2;color:var(--mute);font-size:14px}.an .ac{grid-column:2;font-size:14px;color:var(--green)}
+.an .pe{grid-row:1;grid-column:3;font-weight:700;text-align:right;white-space:nowrap}
+.locked{position:relative;margin-top:8px;padding:18px;border:1px dashed var(--gold);border-radius:12px;background:#FBF7EC}
+.locked p{margin-bottom:10px}
+.pay{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}.pay p{margin:8px 0;font-size:14px}.pay .btn{text-decoration:none;display:inline-flex;align-items:center;margin-top:6px}.pay b{color:var(--navy)}
+.unlock{display:flex;gap:8px;flex-wrap:wrap}
+.unlock input{border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px;flex:1;min-width:160px}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.map label{font-size:13px;color:var(--mute);display:flex;flex-direction:column;gap:3px}
+.map select{border:1px solid var(--line);border-radius:8px;padding:9px;min-height:42px;background:#fff}
+details summary{cursor:pointer;font-weight:600;color:var(--navy);min-height:32px}
+.actions li{margin:0 0 8px 18px}
+.cta{background:var(--navy);color:#fff;border-radius:14px;padding:22px;margin-top:18px}
+.cta h2{color:var(--gold)}.cta p{color:#B7C2D6;margin-bottom:14px}
+svg{width:100%;height:auto;display:block}
+.hide{display:none!important}
+.msg{margin-top:12px;color:#F2B8AE;font-size:14px}
+.note{font-size:13px;color:var(--mute);margin-top:10px}
+.tw{overflow-x:auto}.tbl{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:6px}.tbl th,.tbl td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left}.tbl th{color:var(--mute);font-weight:600;font-size:13px}.tbl .r{text-align:right;white-space:nowrap}.tbl tr:last-child td{border-bottom:0}
+h3{font-family:var(--serif);font-size:17px;color:var(--navy);margin:18px 0 6px}
+.grid{margin-top:14px;color:#B7C2D6;font-size:14px}.grid summary{cursor:pointer;font-weight:600;color:#E6D3A6}.grid p{margin:8px 0}
+.grid textarea{width:100%;background:#0E1D34;border:1px solid #3A4C6C;color:#fff;border-radius:8px;padding:10px 12px;font:inherit;font-size:14px;line-height:1.5}
+.printhead{display:none}
+.printonly{display:none!important}
+#cover .cv{min-height:92vh;display:flex;flex-direction:column;justify-content:center;padding:48px;background:#0A1526;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#cover .cvb{font-family:var(--serif);color:#C19A4B;font-size:22px;margin-bottom:40px}
+#cover h1{font-size:40px;max-width:14em}
+#cover .cvh{font-family:var(--serif);font-size:30px;color:#C19A4B;margin:14px 0 28px}
+#cover p{color:#B7C2D6;margin-top:6px}
+#cover .cvf{margin-top:60px;border-top:1px solid #56688A;padding-top:14px;color:#fff}
+.sig{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:50px}.sig div{border-top:1px solid #333;padding-top:8px;min-height:110px}.sig span{color:var(--mute);font-size:13px}
+.mon{display:inline-block;height:8px;background:var(--gold);border-radius:4px;vertical-align:middle;margin-left:6px}
+@media print{
+ .printonly{display:block!important}#cover{break-after:page;page-break-after:always}#methodo{break-before:page;page-break-before:always}
+ body{background:#fff}.hero .drop,.row,.noprint,details,.unlock,.cta .btn{display:none!important}
+ .hero{background:#fff;color:var(--ink);padding:0}.hero .brand,.hero .sub,.hero h1{display:none}
+ .loss .big{color:var(--navy)}.loss p{color:var(--mute)}.score{background:#eef}
+ .printhead{display:block;border-bottom:2px solid var(--gold);padding:0 0 10px;margin-bottom:12px}
+ .printhead b{font-family:var(--serif);font-size:20px;color:var(--navy)}
+ section.card,.kpi{break-inside:avoid}.cta{background:#fff;color:var(--ink);border:1px solid var(--line)}.cta h2{color:var(--navy)}.cta p{color:var(--ink)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<section id="cover" class="printonly"></section>
+<header class="hero">
+ <div class="wrap">
+  <div class="brand"><b>Radar Hôtelier</b><span id="consultTag"></span></div>
+  <div id="heroIntro">
+   <h1>Combien d'argent votre hôtel perd-il sans le voir ?</h1>
+   <p class="sub">Déposez l'export de votre PMS (Excel, CSV ou TXT). En quelques secondes, le radar chiffre les fuites : séjours non facturés, impayés après départ, tarifs cassés, doubles réservations.</p>
+  </div>
+  <div id="heroResult" class="hide loss">
+   <div class="printhead"><b id="phTitle"></b><div id="phSub" class="note"></div></div>
+   <p>Fuite estimée sur la période</p>
+   <div class="big" id="lossBig">0 Ar</div>
+   <p id="lossSub"></p>
+   <div class="score"><span>Santé des opérations</span><b id="scoreVal">–</b></div>
+  </div>
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choisir un fichier à analyser">
+   <strong>Glissez votre fichier ici ou touchez pour le choisir</strong>
+   <small>.xlsx · .xls · .csv · .txt — les données restent dans votre navigateur</small>
+  </div>
+  <input type="file" id="file" accept=".csv,.txt,.xlsx,.xls,.tsv" class="hide">
+  <div class="row">
+   <label class="f">Nom de l'hôtel<input id="hotel" placeholder="Hôtel exemple"></label>
+   <label class="f">Nombre de chambres<input id="rooms" type="number" min="1" value="120"></label>
+   <button class="btn gold" id="demoBtn">Voir un exemple</button>
+  </div>
+  <details class="grid"><summary>Grille tarifaire de l'hôtel</summary><p>Un tarif par ligne, au format « Type ; montant par nuit » (en Ariary). Le radar s'en sert pour estimer le nombre de chambres de chaque réservation et calculer l'ADR par chambre.</p><textarea id="grid" rows="7" spellcheck="false" aria-label="Grille tarifaire"></textarea></details>
+  <div class="msg" id="err" role="alert"></div>
+ </div>
+</header>
+
+<main class="wrap hide" id="out">
+ <div class="kpis" id="kpis"></div>
+ <section class="card"><h2>Taux d'occupation jour par jour</h2><div id="chart"></div><p class="note" id="chartNote"></p></section>
+ <section class="card"><h2 id="anTitle">Anomalies détectées</h2><div id="anList"></div>
+  <p class="note noprint hide" id="capNote"></p>
+  <button class="btn gold hide noprint" id="xlsBtn" style="margin-top:10px;margin-right:8px">Télécharger le dossier d'audit (Excel)</button>
+  <button class="btn line hide noprint" id="csvBtn" style="margin-top:10px">Télécharger toutes les anomalies (CSV)</button>
+  <div id="lock" class="locked hide noprint">
+   <p id="lockTxt"></p>
+   <div class="pay">
+    <p><b>Rapport complet : <span id="price"></span></b></p>
+    <div id="omBox" class="hide"><button class="btn gold" id="omPay">Payer par Orange Money</button><div class="msg" id="omMsg"></div><p style="font-size:13px;color:var(--mute)">Votre code d'accès s'affiche automatiquement après le paiement. Vous pouvez aussi payer manuellement ci-dessous.</p></div>
+    <p>1. Envoyez le montant par MVola au <b id="mv"></b> ou par Orange Money au <b id="om"></b>, avec la référence <b id="ref"></b> en motif.</p>
+    <p>2. Envoyez la preuve de paiement sur WhatsApp : vous recevez votre code d'accès.</p>
+    <a class="btn gold" id="waPay" target="_blank" rel="noopener">J'ai payé — envoyer la preuve</a>
+   </div>
+   <p style="font-size:14px">Vous avez déjà un code ?</p>
+   <div class="unlock"><input id="code" placeholder="Code d'accès au rapport complet" aria-label="Code d'accès"><button class="btn navy" id="unlockBtn">Débloquer</button></div>
+   <div class="msg" id="codeErr" style="color:var(--red)"></div>
+  </div>
+ </section>
+ <section class="card" id="brkCard"><h2>Où part l'argent</h2><div id="brkTbl"></div></section>
+ <section class="card" id="monCard"><h2>Évolution mensuelle</h2><div id="monTbl"></div></section>
+ <section class="card hide" id="odooCard"><h2>Tableaux de synthèse</h2><div id="odooTbls"></div></section>
+ <section class="card hide noprint" id="cmpCard"><h2>Suivi depuis l'audit précédent</h2><p class="note" style="margin:0 0 10px">Chargez l'export précédent pour voir ce qui a été régularisé, ce qui est nouveau et ce qui traîne.</p><input type="file" id="prevFile" accept=".csv,.txt,.xlsx,.xls,.tsv"><div id="cmpOut" style="margin-top:10px"></div></section>
+ <section class="card hide noprint" id="expCard"><h2>Dépenses et situation globale</h2><p class="note" style="margin:0 0 10px">Chargez l'export des dépenses (Excel ou CSV : date, catégorie, fournisseur, description, montant). Le radar rapproche le chiffre d'affaires des réservations et les dépenses, mois par mois.</p><input type="file" id="expFile" accept=".csv,.txt,.xlsx,.xls,.tsv">
+  <p class="note" style="margin:12px 0 6px">Autres recettes (restauration, bar, spa, location de salles… facultatif) : même format, montants positifs.</p><input type="file" id="recFile" accept=".csv,.txt,.xlsx,.xls,.tsv">
+  <details id="supBox" style="margin-top:12px"><summary>Classer les fournisseurs par catégorie (facultatif)</summary><p class="note" style="margin:8px 0">Utile quand l'export (bons de commande) n'a pas de catégorie. Une ligne par règle : « mot du fournisseur ; catégorie ». Les fournisseurs non reconnus restent « Non classé ».</p><textarea id="supmap" rows="9" spellcheck="false" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit;font-size:14px"></textarea></details>
+  <details id="simBox" style="margin-top:12px"><summary>Simulation des charges manquantes (facultatif)</summary><p class="note" style="margin:8px 0">Si l'export ne contient pas les salaires ou d'autres charges, saisissez une hypothèse en % du chiffre d'affaires. Ce sont vos hypothèses, pas des chiffres de l'hôtel.</p><div class="map">
+   <label>Masse salariale (% du chiffre d'affaires)<input type="number" id="sim_pers" min="0" max="100" step="0.5" placeholder="0"></label>
+   <label>Autres charges non saisies : charges sociales, impôts, assurances… (% du CA)<input type="number" id="sim_aut" min="0" max="100" step="0.5" placeholder="0"></label></div></details>
+  <details id="bilanBox" style="margin-top:12px"><summary>Compléter le bilan (facultatif)</summary><p class="note" style="margin:8px 0">Ces chiffres ne figurent pas dans l'export des réservations. Renseignez-les pour afficher un bilan simplifié.</p><div class="map">
+   <label>Trésorerie (banque + caisse)<input type="number" id="bi_tre" placeholder="0"></label>
+   <label>Stocks<input type="number" id="bi_sto" placeholder="0"></label>
+   <label>Immobilisations nettes<input type="number" id="bi_imm" placeholder="0"></label>
+   <label>Dettes fournisseurs<input type="number" id="bi_four" placeholder="0"></label>
+   <label>Dettes fiscales et sociales<input type="number" id="bi_fisc" placeholder="0"></label>
+   <label>Emprunts<input type="number" id="bi_emp" placeholder="0"></label></div></details>
+  <div id="expOut" style="margin-top:12px"></div></section>
+ <section class="card hide noprint" id="histCard"><h2>Historique des audits</h2><div id="histTbl"></div><button class="btn line" id="histClear" style="margin-top:10px">Effacer l'historique de cet hôtel</button><p class="note">Conservé uniquement dans ce navigateur, par nom d'hôtel.</p></section>
+ <section class="card"><h2>Plan d'action recommandé</h2><ul class="actions" id="plan"></ul></section>
+ <section class="card noprint"><details id="mapBox"><summary>Vérifier la correspondance des colonnes</summary><div class="map" id="mapGrid" style="margin-top:12px"></div><p class="note">Le radar reconnaît les en-têtes courants (Chambre, Arrivée, Départ, Tarif, Total, Payé…). Corrigez ici si une colonne est mal associée.</p></details></section>
+ <section class="cta">
+  <h2>Récupérez cet argent</h2>
+  <p>Un audit complet inclut la correction de chaque ligne, les procédures de clôture et la formation de l'équipe de nuit.</p>
+  <div class="row" style="margin-top:0">
+   <a class="btn gold" id="wa" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center">Demander l'audit complet</a>
+   <button class="btn ghost noprint" id="printBtn" style="background:#fff;color:var(--navy)">Exporter le rapport en PDF</button>
+  </div>
+ </section>
+<section id="methodo" class="card printonly"></section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+/* ===== CONFIGURATION À PERSONNALISER ===== */
+const CONFIG={
+  consultant:"Herizo Rakotoarisoa",
+  titre:"Consultant en Gestion Opérationnelle Hôtelière",
+  whatsapp:"261324223945",     // indicatif sans +
+  supaUrl:"https://gcsxyzmglbdarewsyoxl.supabase.co",
+  supaKey:"sb_publishable_oVNzrR9jCvlAtcQV65XveA_5KgEf47Q",   // clé publique : sans danger dans une page web
+  gratuit:6,                   // anomalies visibles sans code
+  heureDepart:12,              // heure de départ standard (départ tardif au-delà de +2 h)
+  paiementAuto:false,          // passer à true quand les clés Orange Money sont en place (voir LISEZMOI)
+  prix:60000,                  // prix du rapport complet (Ar)
+  mvola:"034 66 368 68",
+  orange:"032 42 239 45"
+};
+/* ========================================= */
+const FIELDS={
+ reference:["reference","ref","n reservation","booking id","booking number","reservation number","reservation id","confirmation number","numero reservation","numero de reservation","id reservation","reservation no","reservation n","booking ref","booking reference","ref reservation","n de reservation"],
+ client:["client","nom du client","nom client","nom","guest","guest name","hote","name","customer","customer name","full name","partner","last name","titulaire","partenaire","nom de l hote"],
+ chambre:["chambre","room number","room no","numero chambre","numero de chambre","n chambre","room","chambres","rooms","room name"],
+ type:["type","categorie","room type","type de chambre","categorie chambre","category"],
+ arrivee:["arrivee","date d entree","date entree","entree","arrival","arrival date","check in","check in date","checkin","date arrivee","date d arrivee","debut","du","date from","from date","start date","date debut","date de debut"],
+ depart:["depart","date de sortie","date sortie","sortie","departure","departure date","check out","check out date","checkout","date depart","date de depart","fin","au","date to","to date","end date","date fin","date de fin"],
+ tarif:["tarif","rate","avg rate","prix nuit","tarif nuit","price per night","nightly rate","adr","prix","price night","prix par nuit","prix unitaire","unit price","tarif unitaire","prix de la nuit"],
+ total:["total","montant total","grand total","total amount","total price","booking total","montant","amount","price","revenu","revenue","ca"],
+ paye:["paye","paid","total paid","amount paid","encaisse","reglement","regle"],
+ solde:["solde","balance due","balance","outstanding","reste a payer","reste du","solde restant","amount due","montant du","montant restant","due amount","reste a regler"],
+ statut:["statut","status","reservation status","booking status","etat","state","booking state"],
+ paiement:["statut du paiement","statut paiement","payment status","etat paiement"],
+ facture:["statut de la facture","statut facture","invoice status","facturation"],
+ devise:["devise","currency","monnaie"],
+ source:["source","canal","channel","origin","origine","vendeur","agent","ota","canal de vente","sales channel","source de reservation"]};
+const LABELS={reference:"Référence",client:"Client",chambre:"Chambre",type:"Type de chambre",arrivee:"Arrivée",depart:"Départ",tarif:"Tarif par nuit",total:"Total séjour",paye:"Montant payé",solde:"Solde restant dû",statut:"Statut du séjour",paiement:"Statut du paiement",facture:"Statut de la facture",devise:"Devise",source:"Canal / vendeur"};
+const S={raw:[],headers:[],map:{},unlocked:false,ref:"RH-"+Math.random().toString(36).slice(2,7).toUpperCase()};
+const $=id=>document.getElementById(id);
+let CUR="Ar";
+const fmt=n=>Math.round(n).toLocaleString("fr-FR")+" "+CUR;
+const fmtAr=n=>Math.round(n).toLocaleString("fr-FR")+" Ar";
+const curLabel=c=>({MGA:"Ar",AR:"Ar",ARIARY:"Ar",EUR:"€",USD:"$",MUR:"Rs",GBP:"£",ZAR:"R",KES:"KSh"}[c]||c||"Ar");
+const pct=n=>(n*100).toLocaleString("fr-FR",{maximumFractionDigits:1})+" %";
+const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+const str=v=>v==null?"":String(v).trim();
+const median=a=>{if(!a.length)return 0;const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+
+/* ---------- Parsing ---------- */
+function parseDate(v){
+ if(v==null||v==="")return null;
+ if(v instanceof Date&&!isNaN(v))return Math.round((v.getTime()-v.getTimezoneOffset()*60000)/864e5);
+ if(typeof v==="number"&&v>20000&&v<80000)return Math.floor(v)-25569;
+ const s=String(v).trim();let m;
+ if(m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/))return Math.floor(Date.UTC(+m[1],m[2]-1,+m[3])/864e5);
+ if(m=s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/)){let y=+m[3];if(y<100)y+=2000;return Math.floor(Date.UTC(y,m[2]-1,+m[1])/864e5)}
+ return null}
+function parseNum(v){
+ if(v==null||v==="")return null;if(typeof v==="number")return v;
+ let s=String(v).replace(/[\s\u00a0]/g,"").replace(/[^0-9,.\-]/g,"");if(!s)return null;
+ if(s.includes(",")&&s.includes("."))s=s.replace(/\./g,"").replace(",",".");else s=s.replace(",",".");
+ const n=parseFloat(s);return isNaN(n)?null:n}
+function parseHour(v){
+ if(v==null||v==="")return null;let mins=null;
+ if(typeof v==="number"){const f=v-Math.floor(v);mins=Math.round(f*1440)}
+ else if(v instanceof Date&&!isNaN(v)){mins=v.getUTCHours()*60+v.getUTCMinutes()}
+ else{const m=String(v).match(/(\d{1,2}):(\d{2})/);if(m)mins=+m[1]*60+ +m[2]}
+ if(mins==null||mins===0||mins>=1440)return null;
+ return Math.floor(mins/60)}
+const dayStr=d=>{const t=new Date(d*864e5);return t.toISOString().slice(8,10)+"/"+t.toISOString().slice(5,7)+"/"+t.toISOString().slice(0,4)};
+function parseCSV(t,F){
+ t=t.replace(/^\uFEFF/,"");const first=t.split(/\r?\n/)[0];
+ const dl=[";","\t","|",","].map(d=>[d,first.split(d).length]).sort((a,b)=>b[1]-a[1])[0][0];
+ const rows=[];let row=[],cur="",q=false;
+ for(let i=0;i<t.length;i++){const c=t[i];
+  if(q){if(c==='"'){if(t[i+1]==='"'){cur+='"';i++}else q=false}else cur+=c}
+  else if(c==='"')q=true;else if(c===dl){row.push(cur);cur=""}
+  else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(cur);rows.push(row);row=[];cur=""}
+  else cur+=c}
+ if(cur!==""||row.length){row.push(cur);rows.push(row)}
+ return rowsToObjects(rows,F)}
+function rowsToObjects(aoa,F){
+ if(!aoa.length)return[];
+ const syns=new Set(Object.values(F||FIELDS).flat());let best=0,bs=-1;
+ aoa.slice(0,15).forEach((r,i)=>{let sc=0;r.forEach(c=>{const n=norm(c);if(n&&syns.has(n))sc++});if(sc>bs){bs=sc;best=i}});
+ const h=aoa[best].map(x=>String(x).trim()),out=[];
+ for(let i=best+1;i<aoa.length;i++){const r=aoa[i];if(!r.some(x=>String(x).trim()!==""))continue;const o={};h.forEach((k,j)=>{if(k)o[k]=r[j]??""});out.push(o)}
+ return out}
+function autoMap(headers,F){
+ F=F||FIELDS;const map={},used=new Set();
+ const EX={chambre:/type|categ|nuit|night/,paye:/reste|solde|due|balance|restant|outstanding|a payer|a regler/};
+ for(const f in F){let best=null,bs=0;
+  headers.forEach(h=>{if(used.has(h))return;const n=norm(h);if(EX[f]&&EX[f].test(n))return;let sc=0;
+   F[f].forEach(syn=>{if(n===syn)sc=Math.max(sc,3);else if(syn.length>3&&n.startsWith(syn))sc=Math.max(sc,2);else if(syn.length>3&&n.includes(syn))sc=Math.max(sc,1)});
+   if(sc>bs){bs=sc;best=h}});
+  if(best){map[f]=best;used.add(best)}}
+ return map}
+
+const DEFAULT_GRID="Standard;108000\nSupérieure avec balcon;176000\nFamiliale;193000\nTriple standard;129250\nSupérieure;159000\nTriple supérieure;176000";
+function parseGrid(t){return String(t||"").split(/\n/).map(l=>{l=l.trim();if(!l)return null;let nom,val;const p=l.split(/[;|\t]/);if(p.length>=2){nom=p.slice(0,-1).join(" ").trim();val=p[p.length-1]}else{const m=l.match(/^(.*?)[\s:=-]+([\d][\d\s.,]*)$/);if(!m)return null;nom=m[1].trim();val=m[2]}const v=parseNum(String(val).replace(/ar|mga/gi,""));return v>0&&nom?{nom,tarif:v}:null}).filter(Boolean)}
+function getGrid(){return parseGrid($("grid").value)}
+function buildCombos(grid){
+ const rates=[...new Set(grid.map(g=>g.tarif))].sort((a,b)=>a-b),maxR=rates.length<=6?12:8,sums=new Map();
+ const rec=(i,cnt,total,combo)=>{if(i===rates.length){if(cnt>0){const o=sums.get(total);if(!o||cnt<o.cnt)sums.set(total,{cnt,combo:combo.slice()})}return}
+  for(let k=0;k+cnt<=maxR;k++){combo[i]=k;rec(i+1,cnt+k,total+k*rates[i],combo)}combo[i]=0};
+ rec(0,0,0,new Array(rates.length).fill(0));
+ return{rates,sums,keys:[...sums.keys()].sort((a,b)=>a-b)}}
+function matchCombo(C,x,tol){
+ const ks=C.keys;let lo=0,hi=ks.length;while(lo<hi){const m=(lo+hi)>>1;if(ks[m]<x)lo=m+1;else hi=m}
+ let best=null;for(let i=Math.max(0,lo-3);i<Math.min(ks.length,lo+3);i++){const t=ks[i],e=Math.abs(x-t)/t;if(e<=tol){const s=C.sums.get(t);if(!best||s.cnt<best.cnt||(s.cnt===best.cnt&&e<best.e))best={cnt:s.cnt,combo:s.combo,e,total:t}}}
+ return best}
+const BUCKETS=["0–30 jours","31–60 jours","61–90 jours","91–180 jours","Plus de 180 jours"];
+const bucket=a=>a<=30?BUCKETS[0]:a<=60?BUCKETS[1]:a<=90?BUCKETS[2]:a<=180?BUCKETS[3]:BUCKETS[4];
+/* ---------- Moteur d'audit ---------- */
+function analyze(raw,map,nRooms,grid){
+ const g=(r,k)=>map[k]?r[map[k]]:undefined;
+ const parsed=raw.map((r,i)=>{const o={ln:i+2,reference:str(g(r,"reference")),client:str(g(r,"client")),chambre:str(g(r,"chambre")),type:str(g(r,"type")),a:parseDate(g(r,"arrivee")),d:parseDate(g(r,"depart")),ha:parseHour(g(r,"arrivee")),hd:parseHour(g(r,"depart")),tarif:parseNum(g(r,"tarif")),total:parseNum(g(r,"total")),paye:parseNum(g(r,"paye")),solde:parseNum(g(r,"solde")),statut:str(g(r,"statut")),pay:str(g(r,"paiement")),fac:str(g(r,"facture")),dev:str(g(r,"devise")),source:str(g(r,"source"))};
+  o.cancel=/annul|cancel/i.test(o.statut);o.noshow=/no.?show|absent/i.test(o.statut);o.draft=/brouillon|draft|initial|devis/i.test(o.statut);
+ 
+  o.valid=o.a!=null&&o.d!=null&&o.d>=o.a;
+  o.badTime=o.valid&&o.a===o.d&&o.ha!=null&&o.hd!=null&&o.hd<=o.ha;if(o.badTime)o.valid=false;
+  o.n=o.valid?Math.max(1,o.d-o.a):0;
+  o.dayUse=o.valid&&o.a===o.d&&o.ha!=null&&o.ha>=6;o.nightArr=o.valid&&o.a===o.d&&o.ha!=null&&o.ha<6;
+  o.skipRate=o.dayUse||(o.a===o.d&&o.ha==null);
+  if(o.valid){if(o.tarif==null&&o.total!=null&&o.total>0)o.tarif=o.total/o.n;if(o.total==null&&o.tarif!=null)o.total=o.tarif*o.n}
+  if(o.solde!=null&&o.paye==null&&o.total!=null)o.paye=Math.max(0,o.total-o.solde);
+  return o});
+ const cc={};parsed.forEach(o=>{if(o.dev){const k=o.dev.toUpperCase();cc[k]=(cc[k]||0)+1}});
+ const dm=Object.entries(cc).sort((a,b)=>b[1]-a[1])[0],domCur=dm?dm[0]:"";CUR=curLabel(domCur);
+ parsed.forEach(o=>{o.foreign=!!o.dev&&o.dev.toUpperCase()!==domCur});
+ const rows=parsed.filter(o=>!(o.a==null&&o.d==null&&!o.client));
+ const ignored=parsed.length-rows.length;
+ const act=rows.filter(o=>o.valid&&!o.cancel&&!o.noshow&&!o.draft&&!o.foreign);
+ const C=(grid&&grid.length&&!map.tarif&&(!domCur||/^(MGA|AR|ARIARY)$/.test(domCur)))?buildCombos(grid):null,minRate=C?C.rates[0]:0,refRate=C?median(C.rates):0;
+ act.forEach(o=>{o.k=1;o.fit="";if(o.dayUse){o.fit="dayuse";return}if(!C||!(o.total>0))return;const nightly=o.total/o.n,m=matchCombo(C,nightly,0.01);
+  if(m){o.k=m.cnt;o.combo=m.combo;o.fit="grille"}else{o.k=Math.max(1,Math.round(nightly/refRate));o.fit="hors"}
+  o.perRoom=o.total/(o.n*o.k);o.tarif=o.perRoom});
+ const gMed=median(act.filter(o=>o.tarif>0).map(o=>o.tarif));
+ const byType={};act.forEach(o=>{if(o.tarif>0&&o.type)(byType[o.type]=byType[o.type]||[]).push(o.tarif)});
+ const med=o=>(o.type&&byType[o.type]&&byType[o.type].length>=5)?median(byType[o.type]):gMed;
+ const today=Math.floor(Date.now()/864e5);
+ const maxD=act.length?Math.max(...act.map(o=>o.d)):today,minA=act.length?Math.min(...act.map(o=>o.a)):today;
+ const ref=Math.min(today,maxD),gone=o=>o.d<=ref,isOut=o=>!map.statut||/sortie|check.?out|parti|termin|done/i.test(o.statut);
+ const an=[];
+ const mk=d=>new Date(d*864e5).toISOString().slice(0,7);
+ const add=(sev,type,o,detail,perte,action)=>{const x={sev,type,src:o.source,cli:o.client,m:o.d!=null?mk(o.d):null,age:o.d!=null?ref-o.d:null,key:[o.reference,o.client,o.a,o.d,o.total].join("|"),ln:o.ln,ref:[o.reference,o.client||"Client inconnu"].filter(Boolean).join(" · ")+(o.chambre?" · ch. "+o.chambre:""),detail,perte:Math.round(perte||0),action};an.push(x);return x};
+ rows.forEach(o=>{
+  if(o.cancel){if(o.paye>0)add("mineure","Annulation avec encaissement",o,fmt(o.paye)+" encaissés sur une réservation annulée.",0,"Justifier la pénalité conservée ou rembourser le client.");return}
+  if(o.draft)return;
+  if(o.foreign){add("mineure","Devise étrangère",o,"Montant en "+o.dev+" exclu du calcul : à convertir ou vérifier.",0,"Vérifier la devise et le montant saisis.");return}
+  if(!o.valid){add("majeure","Dates incohérentes",o,o.badTime?"Heure de sortie avant l'heure d'arrivée le même jour (ligne "+o.ln+").":"Départ avant l'arrivée, ou date illisible (ligne "+o.ln+").",0,"Corriger les dates dans le PMS avant la clôture.");return}
+  if(o.noshow){if(!(o.total>0))add("mineure","No-show non facturé",o,"Aucune pénalité facturée pour une non-présentation.",gMed,"Appliquer la politique de no-show (1 nuit) selon les conditions du tarif.");return}
+  const m=med(o);
+  if(!(o.total>0)){
+   if(gone(o))add("critique","Séjour non facturé",o,o.n+" nuit(s) sans montant.",m*o.n,"Exiger un motif écrit et l'accord de la direction pour toute gratuité.");
+   else add("mineure","Montant à renseigner",o,"Aucun montant pour cette réservation à venir.",0,"Renseigner le tarif avant l'arrivée.");
+  }else{
+   if(C){
+    if(!o.skipRate&&o.perRoom<0.97*minRate){
+     const one=o.n>=2?matchCombo(C,o.total,0.005):null;
+     if(one&&one.cnt<=2)add("critique","Séjour facturé une seule nuit",o,o.n+" nuits mais "+fmt(o.total)+" facturés, soit une seule nuit de "+one.cnt+" chambre(s) au tarif de la grille.",(o.n-1)*o.total,"Vérifier le folio : les nuits suivantes n'ont peut-être pas été facturées.");
+     else if(o.n<=14){const x=add("majeure","Tarif sous la grille",o,fmt(o.perRoom)+" par chambre et par nuit, sous le tarif minimum de la grille ("+fmt(minRate)+").",0,"Justifier la remise par un accord écrit, ou corriger le tarif.");x.gap=(minRate-o.perRoom)*o.k*o.n}
+    }
+   }else if(!o.dayUse){
+    if(o.tarif<0.55*m)add("majeure","Tarif très bas",o,fmt(o.tarif)+" par nuit contre "+fmt(m)+" en médiane.",(m-o.tarif)*o.n,"Instaurer un tarif plancher et une validation du responsable sous ce seuil.");
+    else if(o.tarif>2.8*m)add("mineure","Tarif anormalement élevé",o,fmt(o.tarif)+" par nuit contre "+fmt(m)+" en médiane.",0,"Vérifier la saisie (zéro en trop, mauvais type de chambre, plusieurs chambres).");
+   }
+   if(map.tarif&&o.total!=null&&Math.abs(o.total-o.tarif*o.n)/(o.tarif*o.n)>0.02)add("majeure","Total ≠ tarif × nuits",o,"Total "+fmt(o.total)+" au lieu de "+fmt(o.tarif*o.n)+".",Math.max(0,o.tarif*o.n-o.total),"Recalculer le folio et rechercher l'ajustement manuel.");
+  }
+  if(o.total>0&&o.paye!=null&&o.paye>o.total*1.02)add("majeure","Trop-perçu",o,"Payé "+fmt(o.paye)+" pour un total de "+fmt(o.total)+".",0,"Vérifier le folio : rembourser, émettre un avoir ou rattacher le paiement au bon séjour.");
+  if(o.total>0&&gone(o)&&o.hd!=null&&o.hd>=CONFIG.heureDepart+2&&!o.dayUse)add("mineure","Départ tardif",o,"Départ à "+o.hd+" h pour une heure standard de "+CONFIG.heureDepart+" h.",0,"Facturer le départ tardif selon la politique de l'hôtel, ou noter l'accord de la direction.");
+  let flagged=false;
+  if(o.total>0&&gone(o)){
+   if(o.paye!=null){if(o.paye<o.total*0.98){add("critique","Solde impayé après départ",o,"Payé "+fmt(o.paye)+" sur "+fmt(o.total)+" ; client parti le "+dayStr(o.d)+".",o.total-o.paye,"Relancer le client, ouvrir un dossier débiteur et bloquer tout départ non soldé.");flagged=true}}
+   else if(/non pay|impay|unpaid|not paid/i.test(o.pay)){add("critique","Solde impayé après départ",o,"Statut « "+o.pay+" » ; client parti le "+dayStr(o.d)+".",o.total,"Relancer le client, ouvrir un dossier débiteur et bloquer tout départ non soldé.");flagged=true}
+   else if(/partiel|partial/i.test(o.pay)){add("majeure","Paiement partiel",o,"Règlement partiel sur "+fmt(o.total)+" : solde restant à vérifier.",0,"Relancer le client pour le solde et rapprocher la facture.");flagged=true}
+   if(!flagged){
+    if(!isOut(o))add("majeure","Réservation passée non clôturée",o,"Date de sortie dépassée mais statut « "+o.statut+" ».",0,"Clôturer le séjour dans le PMS ou le marquer no-show / annulé.");
+    else if(/pas de facture|no invoice/i.test(o.pay)||/rien (a|à) facturer|nothing to invoice/i.test(o.fac))add("critique","Séjour terminé non facturé",o,"Séjour terminé sans facture (« "+(o.fac||o.pay)+" »).",o.total,"Émettre la facture ou justifier la gratuité par écrit.");
+    else if(/^\s*(à|a) facturer/i.test(o.fac))add("majeure","Facture à émettre",o,"Séjour terminé, facture encore à émettre.",0,"Émettre la facture avant la clôture du mois.");
+   }
+  }
+  if((map.chambre&&!o.chambre)||(map.client&&!o.client))add("mineure","Données manquantes",o,"Chambre ou client non renseigné.",0,"Rendre ces champs obligatoires à la saisie.");
+ });
+ if(map.chambre){
+  const seen={};act.forEach(o=>{const k=[o.client,o.chambre,o.a,o.d].join("|");if(seen[k])add("majeure","Doublon probable",o,"Même client, chambre et dates que la ligne "+seen[k]+".",0,"Supprimer le doublon pour ne pas gonfler le chiffre d'affaires.");else seen[k]=o.ln});
+  const byRoom={};act.forEach(o=>{if(o.chambre)(byRoom[o.chambre]=byRoom[o.chambre]||[]).push(o)});
+  Object.values(byRoom).forEach(l=>{l.sort((x,y)=>x.a-y.a);for(let i=1;i<l.length;i++)if(l[i].a<l[i-1].d&&!(l[i].a===l[i-1].a&&l[i].d===l[i-1].d&&l[i].client===l[i-1].client))add("critique","Double réservation de chambre",l[i],"Chambre "+l[i].chambre+" déjà occupée du "+dayStr(l[i-1].a)+" au "+dayStr(l[i-1].d)+".",0,"Réaffecter un des deux clients et vérifier l'inventaire.")});
+ }
+ if(!map.chambre&&map.reference){
+  const g2={};act.forEach(o=>{if(o.reference&&o.total>0){const k=[o.reference,o.client,o.a,o.d,o.total].join("|");(g2[k]=g2[k]||[]).push(o)}});
+  Object.values(g2).forEach(l=>{for(let i=1;i<l.length;i++)add("majeure","Doublon probable",l[i],"Même référence, client, dates et montant que la ligne "+l[0].ln+".",0,"Supprimer le doublon pour ne pas gonfler le chiffre d'affaires.")});
+ }
+ {const sv={};act.forEach(o=>{if(!o.source||o.dayUse||!(o.tarif>0))return;const m=med(o);if(!(m>0))return;(sv[o.source]=sv[o.source]||[]).push({r:o.tarif/m,gap:Math.max(0,(m-o.tarif)*o.n*(o.k||1))})});
+  Object.entries(sv).forEach(([k,l])=>{if(l.length<5)return;const mr=median(l.map(x=>x.r));if(mr<0.85){const x=add("majeure","Remises systématiques",{source:k,client:"",reference:"",chambre:"",ln:"—"},"Vendeur / canal « "+k+" » : tarif médian à "+Math.round(mr*100)+" % de la référence sur "+l.length+" séjours (manque à gagner indicatif de "+fmt(l.reduce((s,y)=>s+y.gap,0))+" par rapport au tarif de référence, non inclus dans le total des fuites).",0,"Revoir le contrat ou les remises accordées à ce canal et exiger un accord écrit.");x.ref="Canal : "+k;x.cli=""}})}
+ const order={critique:0,majeure:1,mineure:2};
+ an.sort((x,y)=>y.perte-x.perte||order[x.sev]-order[y.sev]);
+ const nights=act.reduce((s,o)=>s+(o.dayUse?0:o.n)*(o.k||1),0),rev=act.reduce((s,o)=>s+(o.total||0),0),revDay=act.filter(o=>o.dayUse).reduce((s,o)=>s+(o.total||0),0),revRooms=rev-revDay,days=Math.max(1,maxD-minA);
+ const cap=nRooms*days,occ=cap?nights/cap:0;
+ const daily=[];for(let d=minA;d<maxD;d++){let c=0;act.forEach(o=>{if((o.a<=d&&d<o.d)||(o.nightArr&&d===o.a-1))c+=(o.k||1)});daily.push(c/nRooms)}
+ const loss=an.reduce((s,a)=>s+a.perte,0),creances=an.filter(a=>a.type==="Solde impayé après départ").reduce((s,a)=>s+a.perte,0),fuites=loss-creances;
+ const cnt=t=>an.filter(a=>a.sev===t).length;
+ const score=Math.max(0,Math.round(100*(1-Math.min(1,4*(cnt("critique")*3+cnt("majeure")*1.5+cnt("mineure")*.5)/(3*Math.max(1,act.length))))));
+ const grp=(arr,key)=>{const m={};arr.forEach(o=>{const k=key(o)||"—";const e=m[k]=m[k]||{n:0,t:0};e.n++;e.t+=o.total||0});return Object.entries(m).map(([k,e])=>({k,n:e.n,t:e.t})).sort((a,b)=>b.t-a.t)};
+ const brk={};an.forEach(a=>{const e=brk[a.type]=brk[a.type]||{type:a.type,sev:a.sev,n:0,perte:0};e.n++;e.perte+=a.perte});
+ const breakdown=Object.values(brk).sort((x,y)=>y.perte-x.perte||y.n-x.n);
+ const byPay=map.paiement?grp(act,o=>o.pay):[],byFac=map.facture?grp(act,o=>o.fac):[];
+ const sel={};an.forEach(a=>{const k=a.src||"—";const e=sel[k]=sel[k]||{n:0,perte:0};e.n++;e.perte+=a.perte});
+ const bySeller=map.source?grp(act,o=>o.source).map(r=>({...r,na:(sel[r.k]||{}).n||0,perte:(sel[r.k]||{}).perte||0})):[];
+ const cl={};an.filter(a=>a.type==="Solde impayé après départ").forEach(a=>{const k=a.cli||"Client inconnu";const e=cl[k]=cl[k]||{k,n:0,perte:0};e.n++;e.perte+=a.perte});
+ const clientsAll=Object.values(cl).sort((x,y)=>y.perte-x.perte),topClients=clientsAll.slice(0,10);
+ const aging=BUCKETS.map(k=>{const l=an.filter(a=>a.type==="Solde impayé après départ"&&a.age!=null&&bucket(a.age)===k);return{k,n:l.length,perte:l.reduce((s,a)=>s+a.perte,0)}}).filter(x=>x.n);
+ const names={};if(C)grid.forEach(g=>{(names[g.tarif]=names[g.tarif]||[]).push(g.nom)});
+ const mixM={};if(C)act.forEach(o=>{if(!(o.total>0)||o.fit==="dayuse")return;if(o.fit==="grille"){C.rates.forEach((rt,i)=>{const c=o.combo[i]||0;if(c){const e=mixM[rt]=mixM[rt]||{rate:rt,rn:0,rev:0};e.rn+=c*o.n;e.rev+=c*o.n*rt}})}else{const e=mixM[0]=mixM[0]||{rate:0,rn:0,rev:0};e.rn+=o.k*o.n;e.rev+=o.total}});
+ const mix=Object.values(mixM).sort((x,y)=>y.rn-x.rn).map(e=>({nom:e.rate?names[e.rate].join(" / "):"Hors grille (estimé)",rate:e.rate,rn:e.rn,rev:e.rev}));
+ const conf=C?{grille:act.filter(o=>o.fit==="grille").length,hors:act.filter(o=>o.fit==="hors").length,sous:an.filter(a=>a.type==="Tarif sous la grille"||a.type==="Séjour facturé une seule nuit").length,ecart:an.filter(a=>a.type==="Tarif sous la grille").reduce((s,a)=>s+(a.gap||0),0)}:null;
+ const mg={};act.forEach(o=>{if(!o.client)return;const k=o.client+"|"+o.a+"|"+o.d;const e=mg[k]=mg[k]||{client:o.client,a:o.a,d:o.d,lignes:0,k:0,total:0};e.lignes++;e.k+=o.k||1;e.total+=o.total||0});
+ const multi=Object.values(mg).filter(e=>e.k>1).sort((x,y)=>y.k-x.k||y.total-x.total);
+ const catDef=C?[["grille","Nuitées au tarif de la grille"],["special","Nuitées à tarif spécial (hors grille)"],["long","Longs séjours (plus de 14 nuits)"],["dayuse","Day use (journée, sans nuitée)"]]:[["special","Nuitées"],["long","Longs séjours (plus de 14 nuits)"],["dayuse","Day use (journée, sans nuitée)"]];
+ const cat={};catDef.forEach(([k])=>cat[k]={n:0,rn:0,rev:0});
+ act.forEach(o=>{if(!(o.total>0))return;const k=o.dayUse?"dayuse":(o.n>14?"long":(o.fit==="grille"?"grille":"special")),e=cat[k];e.n++;e.rev+=o.total;if(!o.dayUse)e.rn+=o.n*(o.k||1)});
+ const cats=catDef.map(([k,l])=>({k,l,...cat[k]}));
+ const mon={};const mget=k=>mon[k]=mon[k]||{k,n:0,ca:0,na:0,perte:0,rn:0,ch:0,du:0};
+ act.forEach(o=>{const e=mget(mk(o.d));e.n++;e.ca+=o.total||0;e.rn+=(o.dayUse?0:o.n)*(o.k||1);if(o.dayUse)e.du+=o.total||0;else e.ch+=o.total||0});
+ an.forEach(a=>{if(a.m){const e=mget(a.m);e.na++;e.perte+=a.perte}});
+ const months=Object.values(mon).sort((x,y)=>x.k<y.k?-1:1),refMonth=mk(ref);
+ return{creances,fuites,cats,revDay,revRooms,currency:domCur,conf,mix,multi,aging,months,refMonth,clientsAll,breakdown,byPay,byFac,bySeller,topClients,an,loss,score,rev,nights,days,occ,adr:nights?revRooms/nights:0,revpar:cap?revRooms/cap:0,daily,minA,maxD,total:rows.length,valid:act.length,cnt,ignored}}
+
+/* ---------- Données de démonstration ---------- */
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function demoData(){
+ const r=mulberry(42),types=[["Standard",110000],["Supérieure",150000],["Deluxe",195000],["Suite",320000]];
+ const prenoms=["Hery","Voahangy","Andry","Lalaina","Jean","Marie","Thomas","Sophie","Rado","Faniry","Pierre","Nirina","Claire","Mamy","Hanta"],noms=["Rakoto","Randria","Andrianina","Dubois","Martin","Razafy","Rabe","Leroy","Rasoa","Moreau"];
+ const srcs=["Direct","Booking.com","Booking.com","Expedia","Agence","Téléphone"];
+ const today=Math.floor(Date.now()/864e5),start=today-90,out=[];
+ for(let n=0;n<40;n++){const room=101+n,[type,base]=types[n%4];let d=start+Math.floor(r()*3);
+  while(d<today+12){if(r()<0.4){d+=1+Math.floor(r()*2);continue}
+   const nights=1+Math.floor(r()*4),dep=d+nights,tarif=Math.round(base*(0.92+r()*.2)/1000)*1000,total=tarif*nights;
+   const gone=dep<=today,cancel=r()<.05;
+   out.push({Client:prenoms[Math.floor(r()*15)]+" "+noms[Math.floor(r()*10)],Chambre:String(room),Type:type,Arrivée:d,Départ:dep,"Tarif nuit":tarif,Total:cancel?0:total,Payé:cancel?0:(gone?total:Math.round(total*.3)),Statut:cancel?"Annulée":gone?"Parti":(d<=today?"En séjour":"Confirmée"),Canal:srcs[Math.floor(r()*6)]});
+   d=dep}}
+ out.forEach(o=>{if(o.Canal==="Agence"){o["Tarif nuit"]=Math.round(o["Tarif nuit"]*.78/1000)*1000;o.Total=o.Statut==="Annulée"?0:o["Tarif nuit"]*(o.Départ-o.Arrivée);if(o.Statut==="Parti")o.Payé=o.Total}});
+ const iso=d=>new Date(d*864e5).toISOString().slice(0,10);
+ const gone=out.filter(o=>o.Départ<=today&&o.Statut==="Parti");const pick=()=>gone.splice(Math.floor(r()*gone.length),1)[0];
+ for(let i=0;i<6;i++){const o=pick();o["Tarif nuit"]=0;o.Total=0;o.Payé=0}
+ for(let i=0;i<5;i++){const o=pick();o["Tarif nuit"]=Math.round(o["Tarif nuit"]*.35/1000)*1000;o.Total=o["Tarif nuit"]*(o.Départ-o.Arrivée);o.Payé=o.Total}
+ for(let i=0;i<8;i++){const o=pick();o.Payé=Math.round(o.Total*(.15+r()*.45))}
+ for(let i=0;i<3;i++){const o=pick();o.Départ=o.Arrivée}
+ for(let i=0;i<2;i++){const o=pick();o.Total=o.Total-o["Tarif nuit"];o.Payé=o.Total}
+ {const o=pick();o.Payé=o.Total+Math.round(o["Tarif nuit"]*.5)}
+ {const c=out.find(o=>o.Statut==="Annulée");if(c)c.Payé=60000}
+ const o1=pick();out.push({...o1,Client:"Faniry Rabe",Arrivée:o1.Arrivée+1,Départ:o1.Départ+1});
+ const o2=pick();out.push({...o2});
+ const ns=pick();ns.Statut="No-show";ns.Total=0;ns.Payé=0;
+ out.forEach(o=>{o.Arrivée=iso(o.Arrivée);o.Départ=iso(o.Départ)});
+ return out}
+
+/* ---------- Interface ---------- */
+function load(raw){
+ if(!raw.length){$("err").textContent="Le fichier ne contient aucune ligne exploitable.";return}
+ S.raw=raw;S.headers=Object.keys(raw[0]);S.map=autoMap(S.headers);
+ const miss=["arrivee","depart"].filter(f=>!S.map[f]);
+ if(miss.length){$("err").textContent="Colonnes d'arrivée et de départ introuvables. Indiquez-les dans la correspondance des colonnes.";show(null);buildMap();$("out").classList.remove("hide");$("mapBox").open=true;return}
+ $("err").textContent="";run()}
+function run(){
+ const nRooms=Math.max(1,parseInt($("rooms").value)||120);
+ const res=analyze(S.raw,S.map,nRooms,getGrid());S.res=res;$("cmpOut").innerHTML="";show(res);buildMap();histSave(res);renderHist();renderExp()}
+function buildMap(){
+ $("mapGrid").innerHTML=Object.keys(FIELDS).map(f=>'<label>'+LABELS[f]+'<select data-f="'+f+'"><option value="">— ignorer —</option>'+S.headers.map(h=>'<option'+(S.map[f]===h?" selected":"")+'>'+h.replace(/</g,"&lt;")+'</option>').join("")+'</select></label>').join("");
+ $("mapGrid").querySelectorAll("select").forEach(s=>s.onchange=()=>{S.map[s.dataset.f]=s.value;if(S.map.arrivee&&S.map.depart){$("err").textContent="";run()}})}
+function show(res){
+ $("out").classList.remove("hide");if(!res)return;
+ $("heroIntro").classList.add("hide");$("heroResult").classList.remove("hide");
+ const hotel=$("hotel").value.trim()||"Hôtel analysé";
+ $("lossBig").textContent=fmt(res.loss);
+ $("lossSub").textContent=res.rev?pct(res.loss/res.rev)+" du chiffre d'affaires analysé — "+res.an.length+" anomalies sur "+res.valid+" séjours":"Aucun séjour exploitable";
+ $("scoreVal").textContent=res.score+" / 100";
+ $("phTitle").textContent="Rapport d'audit — "+hotel;
+ $("phSub").textContent="Période du "+dayStr(res.minA)+" au "+dayStr(res.maxD)+" · "+CONFIG.consultant+", "+CONFIG.titre;
+ const cg=res.cats.find(c=>c.k==="grille"),cs=res.cats.find(c=>c.k==="special"),cn=(c)=>c&&c.rn?fmt(c.rev/c.rn):"—";
+ $("kpis").innerHTML=[["Taux d'occupation",pct(res.occ)],["ADR (par chambre)",fmt(res.adr)]].concat(res.conf?[["ADR tarifs de la grille",cn(cg)],["ADR tarifs spéciaux",cn(cs)]]:[]).concat([["RevPAR",fmt(res.revpar)],["Chiffre d'affaires total",fmt(res.rev)],["dont day use",fmt(res.revDay)],["Chambres-nuits vendues",res.nights.toLocaleString("fr-FR")],["Créances à recouvrer",fmt(res.creances)],["Fuites de facturation",fmt(res.fuites)],["Anomalies critiques",res.cnt("critique")]]).map(k=>'<div class="kpi"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>').join("");
+ $("chartNote").textContent=res.occ>1?"L'occupation dépasse 100 % : vérifiez le nombre de chambres saisi ou les doubles réservations.":"Période analysée : "+res.days+" jours."+(res.ignored?" "+res.ignored+" ligne(s) de sous-total ignorée(s).":"");
+ drawChart(res.daily);drawAnomalies(res);drawPlan(res);fillPrint(res,hotel);
+ const msg="Bonjour, j'ai analysé "+hotel+" avec le Radar Hôtelier : "+fmt(res.loss)+" de fuites estimées. Je souhaite l'audit complet.";
+ $("wa").href=CONFIG.whatsapp?"https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent(msg):"#";
+ $("wa").onclick=e=>{if(!CONFIG.whatsapp){e.preventDefault();alert("Renseignez votre numéro WhatsApp dans CONFIG.whatsapp en haut du script.")}};
+ setTimeout(()=>$("heroResult").scrollIntoView({behavior:"smooth",block:"start"}),50)}
+function drawChart(v){
+ if(!v.length){$("chart").innerHTML="";return}
+ const W=600,H=120,step=W/Math.max(1,v.length-1),mx=Math.max(1,...v);
+ const pts=v.map((x,i)=>(i*step).toFixed(1)+","+(H-4-(x/mx)*(H-12)).toFixed(1));
+ $("chart").innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Occupation quotidienne"><path d="M0,'+H+' L'+pts.join(" L")+' L'+W+','+H+' Z" fill="#C19A4B" fill-opacity=".22"/><polyline points="'+pts.join(" ")+'" fill="none" stroke="#0F1F38" stroke-width="2"/></svg>'}
+function drawAnomalies(res){
+ const free=S.unlocked?Math.min(res.an.length,150):CONFIG.gratuit,list=res.an.slice(0,free);
+ $("anTitle").textContent="Anomalies détectées ("+res.an.length+")";
+ $("anList").innerHTML=list.length?list.map(a=>'<div class="an"><span class="tag t-'+a.sev+'">'+a.sev+'</span><span class="ti">'+a.type+' — '+a.ref.replace(/</g,"&lt;")+'</span><span class="pe">'+(a.perte?fmt(a.perte):"—")+'</span><span class="de">'+a.detail+'</span><span class="ac">'+a.action+'</span></div>').join(""):'<p class="note">Aucune anomalie détectée sur ce fichier.</p>';
+ const hidden=S.unlocked?0:res.an.length-list.length,hl=res.an.slice(list.length).reduce((s,a)=>s+a.perte,0);
+ $("lock").classList.toggle("hide",hidden<=0);
+ $("csvBtn").classList.toggle("hide",!S.unlocked);
+ $("capNote").classList.toggle("hide",!(S.unlocked&&res.an.length>150));
+ $("capNote").textContent="Les 150 anomalies les plus coûteuses sont affichées sur "+res.an.length+". Téléchargez la liste complète ci-dessous.";
+ $("price").textContent=fmtAr(CONFIG.prix);$("mv").textContent=CONFIG.mvola;$("om").textContent=CONFIG.orange;$("ref").textContent=S.ref;
+ $("waPay").href="https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent("Bonjour, j'ai payé "+fmtAr(CONFIG.prix)+" (MVola / Orange Money) pour le rapport complet de "+($("hotel").value.trim()||"mon hôtel")+". Référence : "+S.ref+". Preuve de paiement ci-jointe.");
+ renderTables(res);
+ $("xlsBtn").classList.toggle("hide",!S.unlocked);
+ $("cmpCard").classList.toggle("hide",!S.unlocked);
+ $("expCard").classList.toggle("hide",!S.unlocked);
+ $("lockTxt").textContent=hidden>0?hidden+" anomalies supplémentaires masquées, représentant "+fmt(hl)+" de fuites. Payez le rapport complet ci-dessous pour les afficher.":""}
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function tbl(head,rows){return '<div class="tw"><table class="tbl"><thead><tr>'+head.map((h,i)=>'<th'+(i?' class="r"':'')+'>'+h+'</th>').join("")+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map((c,i)=>'<td'+(i?' class="r"':'')+'>'+c+'</td>').join("")+'</tr>').join("")+'</tbody></table></div>'}
+function renderTables(res){
+ const tot=res.loss||1;
+ $("brkTbl").innerHTML=res.breakdown.length?tbl(["Cause","Cas","Perte","Part"],res.breakdown.map(b=>[esc(b.type),b.n.toLocaleString("fr-FR"),b.perte?fmt(b.perte):"à vérifier",b.perte?pct(b.perte/tot):"—"])):'<p class="note">Aucune fuite détectée.</p>';
+ const mx=Math.max(1,...res.months.map(m=>m.ca?m.perte/m.ca:0));
+ $("monTbl").innerHTML=res.months.length?tbl(["Mois","Séjours","Chiffre d'affaires","Fuite","Fuite / CA"],res.months.map(m=>{const p=m.ca?m.perte/m.ca:0;return [monLabel(m.k)+(m.k>res.refMonth?" <em>(à venir)</em>":""),m.n.toLocaleString("fr-FR"),fmt(m.ca),m.perte?fmt(m.perte):"—",pct(p)+'<span class="mon" style="width:'+Math.round(60*p/mx)+'px"></span>']})):'';
+ $("monCard").classList.toggle("hide",!res.months.length);
+ let h="";
+ {const tr=res.rev||1;h+="<h3>Chambres, tarifs spéciaux et day use</h3>"+tbl(["Catégorie","Réservations","Chambres-nuits","Chiffre d'affaires","ADR / prix moyen","Part du CA"],res.cats.map(c=>[esc(c.l),c.n.toLocaleString("fr-FR"),c.k==="dayuse"?"—":c.rn.toLocaleString("fr-FR"),fmt(c.rev),c.k==="dayuse"?(c.n?fmt(c.rev/c.n)+" / day use":"—"):(c.rn?fmt(c.rev/c.rn):"—"),pct(c.rev/tr)]))+'<p class="note">Le day use (arrivée de jour, départ le même jour) n\'entre ni dans les chambres-nuits ni dans l\'ADR. Une arrivée de nuit (avant 6 h) comptée au tarif de la nuit reste une nuitée.</p>'}
+ if(res.aging.length){const ta=res.aging.reduce((s,x)=>s+x.perte,0)||1;h+="<h3>Ancienneté des impayés</h3>"+tbl(["Depuis le départ","Séjours","Montant dû","Part"],res.aging.map(x=>[x.k,x.n.toLocaleString("fr-FR"),fmt(x.perte),pct(x.perte/ta)]))}
+ if(res.conf){const c=res.conf,tc=(c.grille+c.hors)||1;h+="<h3>Conformité à la grille tarifaire</h3>"+tbl(["Indicateur","Valeur"],[["Réservations conformes à la grille",c.grille.toLocaleString("fr-FR")+" ("+pct(c.grille/tc)+")"],["Réservations hors grille (remise ou tarif négocié)",c.hors.toLocaleString("fr-FR")],["Tarifs sous le minimum de la grille",c.sous.toLocaleString("fr-FR")],["Écart de remise estimé sous le minimum",fmt(c.ecart)]])}
+ if(res.mix.length){const tm=res.mix.reduce((s,x)=>s+x.rn,0)||1;h+="<h3>Répartition par type de chambre (estimée)</h3>"+tbl(["Type","Chambres-nuits","Part","Revenu estimé"],res.mix.map(x=>[esc(x.nom)+(x.rate?" ("+fmt(x.rate)+")":""),x.rn.toLocaleString("fr-FR"),pct(x.rn/tm),fmt(x.rev)]))}
+ if(res.multi.length)h+="<h3>Réservations multi-chambres</h3><p class=\"note\" style=\"margin:0 0 6px\">"+res.multi.length.toLocaleString("fr-FR")+" réservations de plusieurs chambres. Leur montant est divisé par le nombre de chambres estimé pour calculer l'ADR.</p>"+tbl(["Client","Séjour","Chambres","Montant"],res.multi.slice(0,8).map(g=>[esc(g.client),dayStr(g.a)+" → "+dayStr(g.d),g.k,fmt(g.t||g.total)]))
+ if(res.byPay.length)h+="<h3>Par "+LABELS.paiement.toLowerCase()+"</h3>"+tbl(["Statut","Séjours","Montant"],res.byPay.map(r=>[esc(r.k),r.n.toLocaleString("fr-FR"),fmt(r.t)]));
+ if(res.byFac.length)h+="<h3>Par "+LABELS.facture.toLowerCase()+"</h3>"+tbl(["Statut","Séjours","Montant"],res.byFac.map(r=>[esc(r.k),r.n.toLocaleString("fr-FR"),fmt(r.t)]));
+ if(S.unlocked){
+  if(res.bySeller.length)h+="<h3>Fuites par "+LABELS.source.toLowerCase()+"</h3>"+tbl(["Canal / vendeur","Séjours","Montant","Anomalies","Perte"],res.bySeller.map(r=>[esc(r.k),r.n.toLocaleString("fr-FR"),fmt(r.t),r.na,r.perte?fmt(r.perte):"—"]));
+  if(res.topClients.length)h+="<h3>Clients à relancer en priorité</h3>"+tbl(["Client","Séjours impayés","Montant dû"],res.topClients.map(r=>[esc(r.k),r.n,fmt(r.perte)]));
+ }else if(res.bySeller.length||res.topClients.length)h+='<p class="note noprint">Les tableaux par vendeur et la liste des clients à relancer sont inclus dans le rapport complet.</p>';
+ $("odooCard").classList.toggle("hide",!h);$("odooTbls").innerHTML=h}
+const METH=["Sont exclus du chiffre d'affaires analysé : séjours annulés, brouillons, non-présentations (no-show) et montants en devise étrangère. Les lignes de sous-total d'un export (Odoo) sont ignorées.","Séjour terminé : date de sortie passée et statut de sortie (« Sortie », « Parti »…). Les séjours à date dépassée sans statut de sortie sont signalés « à vérifier », sans montant.","Solde impayé : séjour terminé dont le statut de paiement est « Non payé », ou dont le montant payé est inférieur à 98 % du total. Perte = solde dû.","Séjour terminé non facturé : statut « Pas de facture » ou « Rien à facturer ». Perte = montant du séjour.","Séjour à tarif nul : perte = tarif médian × nombre de nuits.","Grille tarifaire : le montant par nuit de chaque réservation est rapproché de la grille saisie (combinaisons jusqu'à 12 chambres, tolérance 1 %) pour estimer le nombre de chambres. L'ADR est calculé par chambre-nuit estimée.","Séjour facturé une seule nuit : séjour de 2 nuits ou plus dont le montant correspond à une seule nuit de 1 à 2 chambres de la grille. Perte = nuits non facturées × montant d'une nuit.","Tarif sous la grille : tarif par chambre inférieur à 97 % du tarif minimum (hors séjours d'une journée et de plus de 14 nuits). Écart signalé, non compté dans la perte. Sans grille, un tarif très bas = moins de 55 % de la médiane.","Day use : séjour qui commence et finit le même jour avec une arrivée à partir de 6 h. Il est exclu des chambres-nuits, de l'occupation et de l'ADR, et présenté à part. Une arrivée entre 0 h et 6 h avec départ le même jour est comptée comme une nuitée.","Tarif spécial : nuitée dont le montant par chambre ne correspond pas à la grille (remise, convention, tarif négocié), présentée à part, comme les longs séjours de plus de 14 nuits.","Occupation = nuitées vendues ÷ (chambres déclarées × jours de la période). ADR = chiffre d'affaires ÷ nuitées. RevPAR = chiffre d'affaires ÷ capacité."];
+const LIMITES=["Les montants sont des estimations calculées à partir de l'export fourni, sans accès au PMS ni à la comptabilité : à confirmer avant toute relance.","Un statut « Non payé » peut correspondre à un paiement non encore rapproché dans le PMS.","Si l'export ne contient pas le montant payé, les paiements partiels ne sont pas chiffrés.","Le nombre de chambres de chaque réservation n'est pas fourni par l'export : il est estimé à partir des montants et de la grille.","Le taux d'occupation dépend du nombre de chambres déclaré.","Le résultat mensuel rapproche le chiffre d'affaires des réservations (par mois de départ) et les dépenses saisies : c'est une vue d'ensemble, pas une comptabilité.","Ce rapport n'est pas un audit comptable ou légal."];
+const monLabel=k=>new Date(k+"-01T00:00:00Z").toLocaleDateString("fr-FR",{month:"short",year:"numeric",timeZone:"UTC"});
+function fillPrint(res,hotel){
+ $("cover").innerHTML='<div class="cv"><div class="cvb">Radar Hôtelier</div><h1>Rapport d\'audit des revenus</h1><div class="cvh">'+esc(hotel)+'</div><p>Période analysée : du '+dayStr(res.minA)+' au '+dayStr(res.maxD)+'</p><p>Fichier : '+esc(S.file||"—")+' · '+res.total.toLocaleString("fr-FR")+' lignes, '+res.valid.toLocaleString("fr-FR")+' séjours analysés</p><p>Date du rapport : '+new Date().toLocaleDateString("fr-FR")+'</p><div class="cvf">Établi par '+esc(CONFIG.consultant)+'<br>'+esc(CONFIG.titre)+'<br><em>Document confidentiel</em></div></div>';
+ $("methodo").innerHTML='<h2>Méthodologie</h2><ul class="actions">'+METH.map(x=>"<li>"+x+"</li>").join("")+'</ul><h2 style="margin-top:18px">Limites de l\'analyse</h2><ul class="actions">'+LIMITES.map(x=>"<li>"+x+"</li>").join("")+'</ul><div class="sig"><div><b>Établi par</b><br>'+esc(CONFIG.consultant)+'<br><span>Date et signature</span></div><div><b>Pour l\'hôtel</b><br><span>Nom, date, signature et cachet</span></div></div>'}
+function histKey(){return "rh-hist:"+($("hotel").value.trim().toLowerCase()||"hotel")}
+function histLoad(){try{return JSON.parse(localStorage.getItem(histKey())||"[]")}catch(e){return[]}}
+function histSave(res){
+ if(!S.file||S.file==="Données de démonstration")return;
+ const h=histLoad(),sum=a=>a.reduce((s,x)=>s+x.perte,0),T="Solde impayé après départ";
+ const snap={t:Date.now(),f:S.file,p:dayStr(res.minA)+" → "+dayStr(res.maxD),loss:res.loss,rev:res.rev,imp:sum(res.an.filter(a=>a.type===T)),old:res.aging.filter(x=>x.k===BUCKETS[3]||x.k===BUCKETS[4]).reduce((s,x)=>s+x.perte,0),cur:CUR};
+ const last=h[h.length-1];if(last&&last.f===snap.f&&last.loss===snap.loss)return;
+ h.push(snap);try{localStorage.setItem(histKey(),JSON.stringify(h.slice(-24)))}catch(e){}}
+function renderHist(){
+ const h=histLoad();$("histCard").classList.toggle("hide",!h.length);if(!h.length)return;
+ const rows=h.slice().reverse().map((x,i,arr)=>{const pv=arr[i+1],d=pv?x.loss-pv.loss:null;return[new Date(x.t).toLocaleDateString("fr-FR"),esc(x.p),fmt(x.loss),pct(x.rev?x.loss/x.rev:0),fmt(x.imp),fmt(x.old),d==null?"—":(d>0?"+":"")+fmt(d)]});
+ $("histTbl").innerHTML=tbl(["Date","Période","Fuite","Fuite / CA","Impayés","> 90 jours","Évolution"],rows)}
+const EXPF={
+ date:["date","echeance de commande","date de commande","order date","order deadline","date de la depense","date depense","date comptable","date de facture","date facture","date de paiement","expense date","invoice date","jour"],
+ categorie:["categorie","category","produit","compte","account","type de depense","type","rubrique","poste","nature","expense category","famille"],
+ tiers:["fournisseur","vendor","partner","tiers","beneficiaire","employe","employee","payee","supplier","nom du fournisseur"],
+ libelle:["libelle","description","label","note","designation","objet","details","memo","reference de commande","numero de commande","po number","purchase order","reference"],
+ statut:["statut","status","etat"],
+ recep:["arrivee","date de reception","date reception","reception","received date","date de livraison"],
+ acheteur:["acheteur","buyer","demandeur","utilisateur","responsable"],
+ montant:["montant","total","montant total","amount","depense","cout","cost","montant ttc","total ttc","ttc","valeur"],
+ debit:["debit"],credit:["credit"]};
+const mkm=d=>new Date(d*864e5).toISOString().slice(0,7);
+const DEFAULT_SUPMAP="jirama;Énergie, eau et carburant\ngalana;Énergie, eau et carburant\nquincaillerie;Entretien et maintenance\nclimatel;Entretien et maintenance\nairtel;Télécommunications\ntelecom malagasy;Télécommunications\nsanlam;Assurances\nallianz;Assurances\ncentre fiscal;Impôts et taxes\nministere;Impôts et taxes\ncommune urbaine;Impôts et taxes\nalpha conseils;Honoraires et conseils\ntravel;Voyages et déplacements\nautres achat;Autres achats\nautres services;Autres services";
+function getSupMap(){return String($("supmap").value||"").split(/\n/).map(l=>{const p=l.split(";");return p.length>=2&&p[0].trim()?[norm(p[0]),p.slice(1).join(";").trim()]:null}).filter(Boolean)}
+function analyzeExp(raw,res){
+ const map=autoMap(Object.keys(raw[0]||{}),EXPF),g=(r,k)=>map[k]?r[map[k]]:undefined,sm=getSupMap();
+ const today=Math.floor(Date.now()/864e5);let excluded=0;
+ const rows=raw.map((r,i)=>{const st=str(g(r,"statut"));
+  if(/annul|cancel|brouillon|draft|demande de prix|rfq/i.test(st)){excluded++;return null}
+  const dt=parseDate(g(r,"date"));let amt=parseNum(g(r,"montant"));
+  if(amt==null){const d=parseNum(g(r,"debit")),c=parseNum(g(r,"credit"));if(d!=null||c!=null)amt=(d||0)-(c||0)}
+  const tiers=str(g(r,"tiers")),lib=str(g(r,"libelle"));let cat=str(g(r,"categorie"));
+  if(!cat){const t=norm(tiers+" "+lib),hit=sm.find(x=>t.includes(x[0]));cat=hit?hit[1]:"Non classé"}
+  return{ln:i+2,d:dt,m:dt!=null?mkm(dt):"",cat,tiers,lib,amt,rec:parseDate(g(r,"recep")),ach:str(g(r,"acheteur"))}}).filter(o=>o&&o.amt!=null&&o.amt!==0);
+ const total=rows.reduce((s,o)=>s+o.amt,0);
+ const bc={};rows.forEach(o=>{const e=bc[o.cat]=bc[o.cat]||{k:o.cat,n:0,t:0};e.n++;e.t+=o.amt});
+ const cats=Object.values(bc).sort((a,b)=>b.t-a.t);
+ const bm={};rows.forEach(o=>{if(o.m)bm[o.m]=(bm[o.m]||0)+o.amt});
+ const em=Object.keys(bm).sort();
+ const revM={};res.months.forEach(m=>revM[m.k]=m);
+ const allM=[...new Set([...em,...Object.keys(revM)])].filter(k=>em.length&&k>=em[0]&&k<=em[em.length-1]).sort();
+ const months=allM.map(k=>{const r=revM[k]||{ca:0,rn:0,perte:0,ch:0,du:0};return{k,ca:r.ca,rn:r.rn,ch:r.ch||0,du:r.du||0,dep:bm[k]||0,future:k>res.refMonth,perte:r.perte}});
+ const common=months.filter(m=>!m.future&&bm[m.k]!==undefined&&m.ca>0);
+ const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+ const ca=sum(common,m=>m.ca),dep=sum(common,m=>m.dep),rn=sum(common,m=>m.rn),loss=sum(common,m=>m.perte);
+ const ck=new Set(common.map(m=>m.k)),T="Solde impayé après départ";
+ const imp=res.an.filter(a=>a.type===T&&ck.has(a.m)).reduce((s,a)=>s+a.perte,0);
+ const dup={};rows.forEach(o=>{const k=[o.d,(o.tiers||o.lib).toLowerCase(),o.amt].join("|");(dup[k]=dup[k]||[]).push(o)});
+ const dups=Object.values(dup).filter(l=>l.length>1).map(l=>({o:l[0],n:l.length,t:l[0].amt*(l.length-1)})).sort((a,b)=>b.t-a.t);
+ const outl=[];Object.values(bc).forEach(c=>{if(c.n<5)return;const am=rows.filter(o=>o.cat===c.k).map(o=>Math.abs(o.amt)),md=median(am);rows.filter(o=>o.cat===c.k&&Math.abs(o.amt)>5*md&&Math.abs(o.amt)>0).forEach(o=>outl.push({o,md}))});
+ outl.sort((a,b)=>b.o.amt-a.o.amt);
+ const missing=rows.filter(o=>o.cat==="Non classé"||!o.tiers).length;
+ const agg=(key)=>{const m={};rows.forEach(o=>{const k=key(o);if(!k)return;const e=m[k]=m[k]||{k,n:0,t:0};e.n++;e.t+=o.amt});return Object.values(m).sort((a,b)=>b.t-a.t)};
+ const sup=agg(o=>o.tiers),buyers=agg(o=>o.ach),toClass={};
+ rows.filter(o=>o.cat==="Non classé"&&o.tiers).forEach(o=>{const e=toClass[o.tiers]=toClass[o.tiers]||{k:o.tiers,n:0,t:0};e.n++;e.t+=o.amt});
+ const toClassL=Object.values(toClass).sort((a,b)=>b.t-a.t);
+ const unrec=map.recep?rows.filter(o=>o.rec==null&&o.d!=null&&today-o.d>30):[];
+ const unrecT=unrec.reduce((s,o)=>s+o.amt,0),unrecS={};unrec.forEach(o=>{const e=unrecS[o.tiers||"—"]=unrecS[o.tiers||"—"]||{k:o.tiers||"—",n:0,t:0};e.n++;e.t+=o.amt});
+ return{map,list:rows,bm,rows:rows.length,total,cats,months,common:common.length,ca,dep,rn,loss,imp,res:ca-dep,margin:ca?(ca-dep)/ca:0,cpr:rn?dep/rn:0,dups,outl:outl.slice(0,15),missing,from:em[0],to:em[em.length-1],cfrom:common.length?common[0].k:em[0],cto:common.length?common[common.length-1].k:em[em.length-1],excluded,sup,buyers,toClass:toClassL,unrec:unrec.length,unrecT,unrecS:Object.values(unrecS).sort((a,b)=>b.t-a.t),isPO:!!(map.acheteur||map.recep)}}
+const GRP=[["personnel","Charges de personnel",/\bsalaires?\b|\bpaie\b|personnel|cnaps|ostie|remuneration|indemnite|\bprimes?\b|cotisation|main d oeuvre|\bstaff\b|payroll|\bwages?\b/],
+["energie","Énergie, eau et carburant",/jirama|electricite|\beau\b|carburant|gasoil|\bgaz\b|energie|fuel|diesel|petrole|water|electric/],
+["achats","Achats et consommables",/achat|cuisine|restaurant|nourriture|boisson|aliment|consommable|accueil|fourniture|economat|food|beverage|supplies/],
+["entretien","Entretien et maintenance",/entretien|reparation|maintenance|travaux|plomberie|climatisation|repair/],
+["blanch","Blanchisserie et linge",/blanchisserie|linge|laundry|lessive|pressing/],
+["marketing","Marketing et commissions",/marketing|publicite|commission|booking|expedia|promotion|\bcommunication|facebook|google|site web/],
+["impots","Impôts et taxes",/impot|taxe|\btva\b|irsa|patente|douane|redevance|fiscal|\btax/],
+["financier","Frais financiers",/interet|banque|bancaire|agios|emprunt|frais financier|\bbank|interest|\bloan/],
+["autres","Autres charges",/./]];
+const grpOf=o=>{const t=norm(o.cat+" "+o.lib+" "+o.tiers);for(const g of GRP)if(g[2].test(t))return g[0];return"autres"};
+function parseLedger(raw){
+ const map=autoMap(Object.keys(raw[0]||{}),EXPF),g=(r,k)=>map[k]?r[map[k]]:undefined;
+ return raw.map((r,i)=>{const dt=parseDate(g(r,"date"));let amt=parseNum(g(r,"montant"));
+  if(amt==null){const d=parseNum(g(r,"debit")),c=parseNum(g(r,"credit"));if(d!=null||c!=null)amt=(c||0)-(d||0)}
+  return{d:dt,m:dt!=null?mkm(dt):"",cat:str(g(r,"categorie"))||"Autres recettes",tiers:str(g(r,"tiers")),lib:str(g(r,"libelle")),amt}}).filter(o=>o.amt!=null&&o.amt!==0)}
+function finance(e,res){
+ const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0),T="Solde impayé après départ";
+ const ck=new Set(e.months.filter(m=>!m.future&&e.bm[m.k]!==undefined&&m.ca>0).map(m=>m.k)),cm=e.months.filter(m=>ck.has(m.k));
+ const ch=sum(cm,m=>m.ch),du=sum(cm,m=>m.du);
+ const orows=(S.revList||[]).filter(o=>ck.has(o.m)),autres=sum(orows,o=>o.amt),oc={},om={};
+ orows.forEach(o=>{oc[o.cat]=(oc[o.cat]||0)+o.amt;om[o.m]=(om[o.m]||0)+o.amt});
+ const prod=ch+du+autres,g={};GRP.forEach(x=>g[x[0]]=0);
+ e.list.forEach(o=>{if(ck.has(o.m))g[grpOf(o)]+=o.amt});
+ const sp=(parseNum($("sim_pers").value)||0)/100,sa=(parseNum($("sim_aut").value)||0)/100,simP=prod*sp,simA=prod*sa,hadPers=g.personnel>0;
+ g.personnel+=simP;g.autres+=simA;
+ const opx=g.personnel+g.energie+g.achats+g.entretien+g.blanch+g.marketing+g.autres,ebe=prod-opx,rav=ebe-g.impots-g.financier;
+ const days=sum(cm,m=>new Date(+m.k.slice(0,4),+m.k.slice(5,7),0).getDate()),rooms=Math.max(1,parseInt($("rooms").value)||120),rn=sum(cm,m=>m.rn),cap=rooms*days;
+ const occ=cap?rn/cap:0,fixed=g.personnel+g.energie+g.entretien+g.impots+g.financier+g.autres,varc=g.achats+g.blanch+g.marketing;
+ const mr=prod?1-varc/prod:0,seuil=mr>0?fixed/mr:null,beOcc=seuil&&prod?occ*seuil/prod:null;
+ const impM={};res.an.forEach(a=>{if(a.type===T&&a.m)impM[a.m]=(impM[a.m]||0)+a.perte});
+ let cum=0;const tres=cm.map(m=>{const enc=m.ca+(om[m.k]||0)-(impM[m.k]||0),dec=e.bm[m.k]||0;cum+=enc-dec;return{k:m.k,enc,dec,flux:enc-dec,cum}});
+ const cre=sum(res.aging,x=>x.perte),a1=res.aging.find(x=>x.k===BUCKETS[3]),a2=res.aging.find(x=>x.k===BUCKETS[4]);
+ const c90=(a1?a1.perte:0)+(a2?a2.perte:0),prov=0.25*(a1?a1.perte:0)+0.5*(a2?a2.perte:0);
+ const vi=id=>parseNum($(id).value)||0,bi={tre:vi("bi_tre"),sto:vi("bi_sto"),imm:vi("bi_imm"),four:vi("bi_four"),fisc:vi("bi_fisc"),emp:vi("bi_emp")};
+ return{sp,sa,simP,simA,hadPers,ck:cm.length,ch,du,autres,oc,prod,g,opx,ebe,rav,days,rooms,rn,occ,goppar:cap?ebe/cap:0,trevpar:cap?prod/cap:0,cpor:rn?opx/rn:0,seuil,beOcc,tres,cre,c90,prov,bi,fixed,varc}}
+function renderFin(e,res){
+ const f=finance(e,res),P=f.prod||1,pc=v=>pct(v/P);
+ let h='<h2 style="margin-top:28px">États financiers (présentation simplifiée)</h2><p class="note">Établis à partir des réservations, des dépenses et des autres recettes fournies, sur la période commune ('+f.ck+' mois). Amortissements et impôt sur les bénéfices non inclus.</p>';
+ const R=(l,v,b)=>[b?"<b>"+l+"</b>":l,b?"<b>"+fmt(v)+"</b>":fmt(v),pc(v)];
+ const cr=[R("Hébergement (nuitées)",f.ch),R("Day use",f.du)].concat(Object.entries(f.oc).map(([k,v])=>R(esc(k),v))).concat([R("Total des produits d'exploitation",f.prod,1)]);
+ GRP.slice(0,6).concat([GRP[8]]).forEach(x=>{if(f.g[x[0]])cr.push(R(x[1]+((x[0]==="personnel"&&f.simP)||(x[0]==="autres"&&f.simA)?" (dont simulation)":""),f.g[x[0]]))});
+ cr.push(R("Total des charges d'exploitation",f.opx,1),R("Excédent brut d'exploitation (EBE)",f.ebe,1));
+ if(f.g.impots)cr.push(R("Impôts et taxes",f.g.impots));if(f.g.financier)cr.push(R("Frais financiers",f.g.financier));
+ cr.push(R("Résultat avant amortissements et impôt sur les bénéfices",f.rav,1));
+ h+='<h3>Compte de résultat</h3>'+tbl(["Poste","Montant","% des produits"],cr);
+ if(!f.autres)h+='<p class="note">Autres recettes (restauration, bar, spa…) : non fournies. Le chiffre d\'affaires ne comprend que l\'hébergement et le day use des réservations.</p>';
+ const iv=[["Marge d\'EBE",pct(f.prod?f.ebe/f.prod:0)],["Charges de personnel / produits",pc(f.g.personnel)],["Énergie, eau et carburant / produits",pc(f.g.energie)],["TRevPAR (produits par chambre disponible et par jour)",fmt(f.trevpar)],["GOPPAR (EBE par chambre disponible et par jour)",fmt(f.goppar)],["Coût d\'exploitation par chambre-nuit vendue",f.rn?fmt(f.cpor):"—"],["Taux d\'occupation de la période",pct(f.occ)]];
+ if(f.seuil)iv.push(["Seuil de rentabilité estimé (produits)",fmt(f.seuil)+(f.beOcc?" — environ "+pct(f.beOcc)+" d\'occupation":"")]);
+ if(f.simP||f.simA)h+='<p class="note" style="color:var(--amber)">Simulation : masse salariale '+pct(f.sp)+' du chiffre d\'affaires'+(f.sa?' et autres charges '+pct(f.sa):'')+'. Ce sont des hypothèses saisies, pas des chiffres réels.</p>';
+ else if(!f.g.personnel)h+='<p class="note" style="color:var(--amber)">Aucune charge de personnel détectée dans les dépenses : l\'EBE et le résultat sont surestimés tant que la masse salariale n\'est pas incluse.</p>';
+ h+='<h3>Ratios clés</h3>'+tbl(["Indicateur","Valeur"],iv)+'<p class="note">Seuil de rentabilité : hypothèse de charges fixes (personnel, énergie, entretien, impôts, frais financiers, autres) et variables (achats, blanchisserie, commissions).</p>';
+ h+='<h3>Trésorerie estimée</h3>'+tbl(["Mois","Encaissements estimés","Décaissements","Flux net","Cumul"],f.tres.map(t=>[monLabel(t.k),fmt(t.enc),fmt(t.dec),fmt(t.flux),fmt(t.cum)]))+'<p class="note">Encaissements estimés = produits du mois moins les séjours terminés restés impayés. Décaissements = dépenses saisies. Estimation : le solde bancaire réel peut différer.</p>';
+ h+='<h3>Créances clients</h3>'+tbl(["Poste","Montant"],[["Créances sur séjours terminés impayés",fmt(f.cre)],["dont de plus de 90 jours",fmt(f.c90)],["Provision indicative (25 % de 91 à 180 jours, 50 % au-delà)",fmt(f.prov)],["Créances nettes de provision",fmt(f.cre-f.prov)]]);
+ const b=f.bi,any=b.tre||b.sto||b.imm||b.four||b.fisc||b.emp;
+ if(any){const cn=f.cre-f.prov,act=cn+b.tre+b.sto+b.imm,dettes=b.four+b.fisc+b.emp,cp=act-dettes,dc=b.four+b.fisc;
+  h+='<h3>Bilan simplifié</h3>'+tbl(["Actif","Montant"],[["Immobilisations nettes",fmt(b.imm)],["Stocks",fmt(b.sto)],["Créances clients nettes",fmt(cn)],["Trésorerie",fmt(b.tre)],["<b>Total actif</b>","<b>"+fmt(act)+"</b>"]])+tbl(["Passif","Montant"],[["Capitaux propres et résultats (solde)",fmt(cp)],["Emprunts",fmt(b.emp)],["Dettes fournisseurs",fmt(b.four)],["Dettes fiscales et sociales",fmt(b.fisc)],["<b>Total passif</b>","<b>"+fmt(act)+"</b>"]]);
+  const rt=[];if(dc>0)rt.push(["Liquidité générale (créances + stocks + trésorerie) / dettes courantes",((cn+b.sto+b.tre)/dc).toLocaleString("fr-FR",{maximumFractionDigits:2})]);if(cp>0)rt.push(["Endettement (emprunts / capitaux propres)",pct(b.emp/cp)]);
+  if(rt.length)h+=tbl(["Ratio de structure","Valeur"],rt);
+  h+='<p class="note">Bilan indicatif : les capitaux propres sont calculés par différence. Il ne remplace pas un bilan établi par un comptable.</p>'}
+ else h+='<p class="note">Bilan : renseignez la trésorerie, les stocks, les immobilisations et les dettes (bloc « Compléter le bilan ») pour l\'afficher.</p>';
+ S.fin=f;return h}
+function renderExp(){
+ const el=$("expOut");if(!S.expRaw||!S.res){el.innerHTML="";return}
+ let e;try{e=analyzeExp(S.expRaw,S.res)}catch(x){el.innerHTML='<p class="note" style="color:var(--red)">Fichier illisible : '+esc(x.message)+'</p>';return}
+ S.exp=e;
+ if(!e.rows||!e.map.montant&&!e.map.debit){el.innerHTML='<p class="note" style="color:var(--red)">Colonne « montant » introuvable. Vérifiez les en-têtes (Date, Catégorie, Fournisseur, Description, Montant).</p>';return}
+ const kp=(l,v)=>'<div class="kpi"><small>'+l+'</small><b>'+v+'</b></div>';
+ const f0=finance(e,S.res),partiel=!f0.hadPers&&!f0.simP,sim=f0.simP||f0.simA;
+ let h='<div class="kpis">'+kp("Chiffre d\'affaires (période commune)",fmt(e.ca))+kp(partiel?"Achats et dépenses saisies":"Dépenses",fmt(e.dep))+kp(partiel?"CA moins dépenses saisies":"Résultat",fmt(e.res))+kp(partiel?"Marge sur dépenses saisies":"Marge",pct(e.margin))+kp("Dépenses par chambre-nuit",e.rn?fmt(e.cpr):"—")+kp(partiel?"Trésorerie estimée (hors personnel)":"Résultat de trésorerie estimé",fmt(e.res-e.imp))+(sim?kp("Résultat simulé (avant amortissements)",fmt(f0.rav)):"")+'</div>';
+ h+='<p class="note">Période commune : '+e.common+' mois ('+monLabel(e.cfrom)+' à '+monLabel(e.cto)+', hors mois à venir). Le chiffre d\'affaires est celui des réservations, par mois de départ.</p>';
+ h+='<p style="margin-top:10px">Les impayés estimés sur ces mois ('+fmt(e.imp)+') ne sont pas encaissés : le résultat de trésorerie estimé est donc de <b>'+fmt(e.res-e.imp)+'</b>. Si les fuites estimées ('+fmt(e.loss)+') étaient récupérées, le résultat passerait à <b>'+fmt(e.res+e.loss)+'</b>.</p>';
+ const tt=e.total||1;
+ h+='<h3>Dépenses par catégorie</h3>'+tbl(["Catégorie","Lignes","Montant","Part"],e.cats.slice(0,15).map(c=>[esc(c.k),c.n.toLocaleString("fr-FR"),fmt(c.t),pct(c.t/tt)]));
+ h+='<h3>Résultat mois par mois</h3>'+tbl(["Mois","Chiffre d\'affaires","Dépenses","Résultat","Marge"],e.months.map(m=>[monLabel(m.k)+(m.future?" <em>(à venir)</em>":""),fmt(m.ca),fmt(m.dep),fmt(m.ca-m.dep),m.ca?pct((m.ca-m.dep)/m.ca):"—"]));
+ if(e.isPO)h+='<p class="note" style="color:var(--amber)">Cet export ne contient que les achats (bons de commande). Les salaires, impôts directs, charges sociales et toute dépense sans bon de commande n\'y figurent pas : le résultat ci-dessus est donc surestimé tant que ces charges ne sont pas ajoutées.</p>';
+ if(e.excluded)h+='<p class="note">'+e.excluded.toLocaleString("fr-FR")+' ligne(s) annulée(s) ou en demande de prix exclue(s).</p>';
+ if(e.sup.length){const ts=e.sup.slice(0,10).reduce((s,x)=>s+x.t,0);h+='<h3>Principaux fournisseurs</h3>'+tbl(["Fournisseur","Commandes","Montant","Part"],e.sup.slice(0,10).map(x=>[esc(x.k),x.n.toLocaleString("fr-FR"),fmt(x.t),pct(x.t/(e.total||1))]))+'<p class="note">Les 10 premiers fournisseurs représentent '+pct(ts/(e.total||1))+' des dépenses ('+e.sup.length.toLocaleString("fr-FR")+' fournisseurs au total).</p>'}
+ if(e.buyers.length>1)h+='<h3>Achats par acheteur</h3>'+tbl(["Acheteur","Commandes","Montant","Part"],e.buyers.slice(0,8).map(x=>[esc(x.k),x.n.toLocaleString("fr-FR"),fmt(x.t),pct(x.t/(e.total||1))]));
+ if(e.toClass.length)h+='<h3>Fournisseurs à classer</h3>'+tbl(["Fournisseur","Commandes","Montant"],e.toClass.slice(0,8).map(x=>[esc(x.k),x.n.toLocaleString("fr-FR"),fmt(x.t)]))+'<p class="note">Ajoutez-les dans « Classer les fournisseurs par catégorie » pour une analyse par catégorie fiable.</p>';
+ if(e.unrec)h+='<h3>Commandes non réceptionnées depuis plus de 30 jours</h3>'+tbl(["Indicateur","Valeur"],[["Commandes",e.unrec.toLocaleString("fr-FR")],["Montant",fmt(e.unrecT)]])+tbl(["Fournisseur","Commandes","Montant"],e.unrecS.slice(0,5).map(x=>[esc(x.k),x.n.toLocaleString("fr-FR"),fmt(x.t)]))+'<p class="note">À vérifier : marchandise non reçue, service déjà consommé mais réception non enregistrée, ou commande à clôturer.</p>';
+ if(e.dups.length)h+='<h3>Dépenses en double possibles</h3>'+tbl(["Date","Fournisseur","Description","Montant","Fois"],e.dups.slice(0,8).map(x=>[x.o.d!=null?dayStr(x.o.d):"—",esc(x.o.tiers||"—"),esc(x.o.lib||"—"),fmt(x.o.amt),x.n]));
+ if(e.outl.length)h+='<h3>Dépenses inhabituelles (plus de 5 fois la médiane de leur catégorie)</h3>'+tbl(["Date","Catégorie","Fournisseur","Montant","Médiane"],e.outl.slice(0,8).map(x=>[x.o.d!=null?dayStr(x.o.d):"—",esc(x.o.cat),esc(x.o.tiers||"—"),fmt(x.o.amt),fmt(x.md)]));
+ if(e.missing)h+='<p class="note">'+e.missing.toLocaleString("fr-FR")+' ligne(s) sans catégorie ou sans fournisseur : à compléter pour une analyse fiable.</p>';
+ h+=renderFin(e,S.res);
+ el.innerHTML=h}
+function exportXLSX(){
+ if(typeof XLSX==="undefined"){alert("Export Excel indisponible hors ligne. Utilisez le CSV.");return}
+ const r=S.res,hotel=$("hotel").value.trim()||"Hôtel analysé",wb=XLSX.utils.book_new();
+ const sheet=(name,aoa,w)=>{const ws=XLSX.utils.aoa_to_sheet(aoa);ws["!cols"]=w.map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,name);return ws};
+ const fm=(ws,cells,z)=>cells.forEach(c=>{if(ws[c])ws[c].z=z});
+ const rg=(col,a,b)=>{const o=[];for(let i=a;i<=b;i++)o.push(col+i);return o};
+ const ws1=sheet("Synthèse",[["Dossier d'audit des revenus — Radar Hôtelier"],["Hôtel",hotel],["Période",dayStr(r.minA)+" au "+dayStr(r.maxD)],["Fichier analysé",S.file||""],["Date du rapport",new Date().toLocaleDateString("fr-FR")],["Établi par",CONFIG.consultant+", "+CONFIG.titre],[],["Indicateurs",""],["Fuite estimée (Ar)",r.loss],["Part du chiffre d'affaires",r.rev?r.loss/r.rev:0],["Santé des opérations (/100)",r.score],["Taux d'occupation",r.occ],["ADR (Ar)",Math.round(r.adr)],["RevPAR (Ar)",Math.round(r.revpar)],["Chiffre d'affaires analysé (Ar)",Math.round(r.rev)],["Nuitées vendues",r.nights],["Séjours analysés",r.valid],[],["Cause","Gravité","Cas","Perte estimée (Ar)","Part de la perte"]].concat(r.breakdown.map(b=>[b.type,b.sev,b.n,b.perte,r.loss?b.perte/r.loss:0])),[36,16,10,20,18]);
+ fm(ws1,["B9","B13","B14","B15","B16"].concat(rg("D",20,19+r.breakdown.length)),"#,##0");fm(ws1,["B10","B12"].concat(rg("E",20,19+r.breakdown.length)),"0.0%");
+ const a1={};r.an.forEach(a=>{if(!a1[a.type])a1[a.type]=a.action});
+ sheet("Plan d'action",[["Cause","Gravité","Cas","Perte estimée (Ar)","Action recommandée","Responsable","Échéance","Statut","Preuve de correction"]].concat(r.breakdown.map(b=>[b.type,b.sev,b.n,b.perte,a1[b.type]||"","","","À faire",""])),[34,12,8,18,70,18,14,12,30]);
+ const ws3=sheet("Anomalies",[["Gravité","Type","Réservation","Canal / vendeur","Mois de sortie","Détail","Perte estimée (Ar)","Action recommandée","Responsable","Échéance","Statut","Preuve de correction"]].concat(r.an.map(a=>[a.sev,a.type,a.ref,a.src||"",a.m||"",a.detail,a.perte,a.action,"","","À faire",""])),[11,30,44,16,12,60,18,60,16,12,10,26]);
+ fm(ws3,rg("G",2,1+r.an.length),"#,##0");
+ const imp=r.an.filter(a=>a.type==="Solde impayé après départ");
+ const ws4=sheet("Impayés",[["Réservation","Client","Détail","Montant dû (Ar)","Âge (jours)","Tranche","Date de relance","Résultat de la relance","Statut"]].concat(imp.map(a=>[a.ref,a.cli||"",a.detail,a.perte,a.age,a.age!=null?bucket(a.age):"","","","À relancer"])),[44,34,50,18,12,18,16,30,12]);
+ fm(ws4,rg("D",2,1+imp.length),"#,##0");
+ sheet("Ancienneté",[["Depuis le départ","Séjours","Montant dû (Ar)"]].concat(r.aging.map(x=>[x.k,x.n,x.perte])),[24,12,20]);
+ sheet("Catégories",[["Catégorie","Réservations","Chambres-nuits","Chiffre d'affaires (Ar)","ADR / prix moyen (Ar)"]].concat(r.cats.map(c=>[c.l,c.n,c.k==="dayuse"?"":c.rn,Math.round(c.rev),c.k==="dayuse"?(c.n?Math.round(c.rev/c.n):""):(c.rn?Math.round(c.rev/c.rn):"")])),[44,14,16,24,22]);
+ if(r.conf)sheet("Grille tarifaire",[["Conformité à la grille"],["Réservations conformes",r.conf.grille],["Réservations hors grille",r.conf.hors],["Tarifs sous le minimum",r.conf.sous],["Écart de remise estimé (Ar)",r.conf.ecart],[],["Type de chambre","Tarif de la grille (Ar)","Chambres-nuits estimées","Revenu estimé (Ar)"]].concat(r.mix.map(x=>[x.nom,x.rate,x.rn,Math.round(x.rev)])).concat([[],["Réservations multi-chambres","","",""],["Client","Arrivée","Départ","Chambres estimées","Montant (Ar)"]]).concat(r.multi.slice(0,200).map(g=>[g.client,dayStr(g.a),dayStr(g.d),g.k,Math.round(g.total)])),[44,22,22,18,18]);
+ const ws5=sheet("Clients à relancer",[["Client","Séjours impayés","Montant dû (Ar)","Date de relance","Résultat","Statut"]].concat(r.clientsAll.map(c=>[c.k,c.n,c.perte,"","","À relancer"])),[44,16,18,16,30,12]);
+ fm(ws5,rg("C",2,1+r.clientsAll.length),"#,##0");
+ const ws6=sheet("Évolution mensuelle",[["Mois","Séjours","Chiffre d'affaires (Ar)","Anomalies","Fuite estimée (Ar)","Fuite / CA"]].concat(r.months.map(m=>[m.k+(m.k>r.refMonth?" (à venir)":""),m.n,Math.round(m.ca),m.na,m.perte,m.ca?m.perte/m.ca:0])),[18,10,22,12,20,12]);
+ fm(ws6,rg("C",2,1+r.months.length).concat(rg("E",2,1+r.months.length)),"#,##0");fm(ws6,rg("F",2,1+r.months.length),"0.0%");
+ sheet("Méthodologie",[["Méthodologie"]].concat(METH.map(x=>[x])).concat([[""],["Limites de l'analyse"]]).concat(LIMITES.map(x=>[x])),[140]);
+ if(S.exp&&S.exp.rows){const x=S.exp;
+  sheet("Dépenses par catégorie",[["Catégorie","Lignes","Montant (Ar)","Part"]].concat(x.cats.map(c=>[c.k,c.n,Math.round(c.t),x.total?c.t/x.total:0])),[40,10,22,10]);
+  const wsx=sheet("Résultat mensuel",[["Mois","Chiffre d'affaires (Ar)","Dépenses (Ar)","Résultat (Ar)","Marge"]].concat(x.months.map(m=>[m.k+(m.future?" (à venir)":""),Math.round(m.ca),Math.round(m.dep),Math.round(m.ca-m.dep),m.ca?(m.ca-m.dep)/m.ca:0])).concat([[],["Période commune (hors mois à venir)",Math.round(x.ca),Math.round(x.dep),Math.round(x.res),x.margin],["Impayés estimés sur la période","","",Math.round(x.imp)],["Résultat de trésorerie estimé","","",Math.round(x.res-x.imp)],["Fuites estimées sur la période","","",Math.round(x.loss)]]),[34,24,20,20,10]);
+  sheet("Principaux fournisseurs",[["Fournisseur","Commandes","Montant (Ar)","Part"]].concat(x.sup.slice(0,50).map(c=>[c.k,c.n,Math.round(c.t),x.total?c.t/x.total:0])),[44,12,22,10]);
+  if(x.buyers.length>1)sheet("Achats par acheteur",[["Acheteur","Commandes","Montant (Ar)","Part"]].concat(x.buyers.map(c=>[c.k,c.n,Math.round(c.t),x.total?c.t/x.total:0])),[30,12,22,10]);
+  if(x.unrec)sheet("Non réceptionnées",[["Fournisseur","Commandes","Montant (Ar)"]].concat(x.unrecS.slice(0,50).map(c=>[c.k,c.n,Math.round(c.t)])),[44,12,22]);
+  sheet("Dépenses à vérifier",[["Type","Date","Catégorie","Fournisseur","Description","Montant (Ar)","Détail"]].concat(x.dups.map(d=>["Double possible",d.o.d!=null?dayStr(d.o.d):"",d.o.cat,d.o.tiers,d.o.lib,Math.round(d.o.amt),d.n+" lignes identiques"])).concat(x.outl.map(d=>["Inhabituelle",d.o.d!=null?dayStr(d.o.d):"",d.o.cat,d.o.tiers,d.o.lib,Math.round(d.o.amt),"Médiane de la catégorie : "+Math.round(d.md)])),[18,12,26,28,40,18,36])}
+ if(S.fin&&S.exp&&S.exp.rows){const f=S.fin,P=f.prod||1,rows=[["Compte de résultat (période commune)","Montant (Ar)","% des produits"],["Hébergement (nuitées)",Math.round(f.ch),f.ch/P],["Day use",Math.round(f.du),f.du/P]];
+  Object.entries(f.oc).forEach(([k,v])=>rows.push([k,Math.round(v),v/P]));
+  rows.push(["Total des produits d'exploitation",Math.round(f.prod),1]);
+  GRP.forEach(x=>{if(x[0]!=="impots"&&x[0]!=="financier"&&f.g[x[0]])rows.push([x[1],Math.round(f.g[x[0]]),f.g[x[0]]/P])});
+  rows.push(["Total des charges d'exploitation",Math.round(f.opx),f.opx/P],["Excédent brut d'exploitation (EBE)",Math.round(f.ebe),f.ebe/P],["Impôts et taxes",Math.round(f.g.impots),f.g.impots/P],["Frais financiers",Math.round(f.g.financier),f.g.financier/P],["Résultat avant amortissements et impôt sur les bénéfices",Math.round(f.rav),f.rav/P],[],["Hypothèses de simulation (en % du chiffre d'affaires)",""],["Masse salariale simulée",f.sp],["Autres charges simulées",f.sa],[],["Ratios clés","Valeur"],["TRevPAR (Ar)",Math.round(f.trevpar)],["GOPPAR (Ar)",Math.round(f.goppar)],["Coût d'exploitation par chambre-nuit (Ar)",Math.round(f.cpor)],["Taux d'occupation de la période",f.occ],["Seuil de rentabilité estimé (Ar)",f.seuil?Math.round(f.seuil):""],[],["Trésorerie estimée : mois","Encaissements (Ar)","Décaissements (Ar)","Flux net (Ar)","Cumul (Ar)"]);
+  f.tres.forEach(t=>rows.push([t.k,Math.round(t.enc),Math.round(t.dec),Math.round(t.flux),Math.round(t.cum)]));
+  rows.push([],["Créances clients","Montant (Ar)"],["Créances sur séjours terminés impayés",Math.round(f.cre)],["dont de plus de 90 jours",Math.round(f.c90)],["Provision indicative",Math.round(f.prov)],["Créances nettes",Math.round(f.cre-f.prov)]);
+  const wf=sheet("État financier",rows,[58,22,22,18,18]);wf["!cols"][1]={wch:22}}
+ wb.SheetNames.forEach(n=>{const sh=wb.Sheets[n];for(const k in sh){if(k[0]!=="!"&&sh[k].t==="s")sh[k].v=sh[k].v.replace(/\(Ar\)/g,"("+CUR+")")}});
+ XLSX.writeFile(wb,"audit-"+(hotel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"hotel")+".xlsx")}
+function exportCSV(){
+ const rows=[["Gravité","Type","Réservation","Détail","Perte estimée ("+CUR+")","Action recommandée","Responsable","Échéance","Statut","Preuve de correction"]].concat(S.res.an.map(a=>[a.sev,a.type,a.ref,a.detail,a.perte,a.action,"","","À faire",""]));
+ const csv="\uFEFF"+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(";")).join("\r\n");
+ const u=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=u;a.download="anomalies-radar-hotelier.csv";a.click();URL.revokeObjectURL(u)}
+function drawPlan(res){
+ const c=t=>res.an.filter(a=>a.type===t).length,p=[];
+ if(c("Solde impayé après départ"))p.push("Lancer une relance immédiate des "+c("Solde impayé après départ")+" soldes impayés et interdire tout départ non soldé.");
+ {const old=(res.aging||[]).filter(x=>x.k===BUCKETS[3]||x.k===BUCKETS[4]),on=old.reduce((s,x)=>s+x.n,0),om=old.reduce((s,x)=>s+x.perte,0);if(on)p.push("Traiter en priorité les "+on+" créances de plus de 90 jours ("+fmt(om)+") : plus le temps passe, plus elles sont difficiles à recouvrer.")}
+ if(c("Séjour non facturé"))p.push("Contrôler les "+c("Séjour non facturé")+" séjours à tarif nul : motif écrit et validation direction obligatoires.");
+ if(c("Séjour terminé non facturé"))p.push("Émettre ou justifier par écrit les "+c("Séjour terminé non facturé")+" séjours terminés sans facture.");
+ if(c("Réservation passée non clôturée"))p.push("Clôturer les "+c("Réservation passée non clôturée")+" réservations dont la date de sortie est dépassée.");
+ if(c("Paiement partiel"))p.push("Relancer les "+c("Paiement partiel")+" clients au règlement partiel pour le solde.");
+ if(c("Facture à émettre"))p.push("Émettre les "+c("Facture à émettre")+" factures en attente avant la clôture du mois.");
+ if(c("Séjour facturé une seule nuit"))p.push("Contrôler les "+c("Séjour facturé une seule nuit")+" séjours de plusieurs nuits facturés une seule nuit : nuits possiblement non facturées.");
+ if(c("Tarif sous la grille"))p.push("Faire justifier par écrit les "+c("Tarif sous la grille")+" tarifs inférieurs au minimum de la grille.");
+ if(c("Tarif très bas"))p.push("Fixer un tarif plancher par type de chambre et exiger une validation sous ce seuil.");
+ if(c("Double réservation de chambre"))p.push("Réaffecter les chambres en conflit et auditer la synchronisation des canaux de vente.");
+ if(c("Total ≠ tarif × nuits"))p.push("Revoir les folios dont le total ne correspond pas au tarif : ajustements manuels non justifiés.");
+ if(c("Dates incohérentes")||c("Données manquantes"))p.push("Rendre dates, chambre et client obligatoires dans la saisie des réservations.");
+ if(c("No-show non facturé"))p.push("Appliquer systématiquement la pénalité de no-show.");
+ p.push("Faire contrôler ce rapport chaque nuit lors du Night Audit, avant la clôture de la journée.");
+ $("plan").innerHTML=p.map(x=>"<li>"+x+"</li>").join("")}
+
+/* ---------- Événements ---------- */
+async function readRows(f,F,pref){
+ if(/\.(xlsx|xls)$/i.test(f.name)){
+  if(typeof XLSX==="undefined")throw new Error("Lecture Excel indisponible hors ligne. Enregistrez le fichier en CSV.");
+  const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});
+  let name=pref?wb.SheetNames.find(n=>pref.test(norm(n))):null;
+  if(!name){let bs=-1;const syns=new Set(Object.values(F||FIELDS).flat());
+   wb.SheetNames.forEach(n=>{const aoa=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:"",raw:true}).slice(0,15);let sc=0;aoa.forEach(r=>{let c=0;r.forEach(x=>{const k=norm(x);if(k&&syns.has(k))c++});if(c>sc)sc=c});const tot=sc*100000+aoa.length;if(tot>bs){bs=tot;name=n}})}
+  return rowsToObjects(XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:"",raw:true}),F)}
+ return parseCSV(await f.text(),F)}
+async function readFile(f){
+ S.file=f.name;$("err").textContent="";
+ try{load(await readRows(f))}catch(e){$("err").textContent="Fichier illisible : "+e.message}}
+$("prevFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;
+ try{
+  const raw=await readRows(f);if(!raw.length)throw new Error("fichier vide");
+  const prev=analyze(raw,autoMap(Object.keys(raw[0])),Math.max(1,parseInt($("rooms").value)||120),getGrid());
+  const T="Solde impayé après départ",P=prev.an.filter(a=>a.type===T),C=S.res.an.filter(a=>a.type===T);
+  const pk=new Set(P.map(a=>a.key)),ck=new Set(C.map(a=>a.key));
+  const reg=P.filter(a=>!ck.has(a.key)),nou=C.filter(a=>!pk.has(a.key)),per=C.filter(a=>pk.has(a.key)),sum=l=>l.reduce((s,a)=>s+a.perte,0);
+  $("cmpOut").innerHTML=tbl(["Impayés","Cas","Montant"],[["Audit précédent",P.length,fmt(sum(P))],["Plus impayés (réglés, annulés ou supprimés)",reg.length,fmt(sum(reg))],["Toujours impayés",per.length,fmt(sum(per))],["Nouveaux impayés",nou.length,fmt(sum(nou))],["Audit actuel",C.length,fmt(sum(C))]])+'<p class="note">Les séjours sont comparés par référence, client, dates et montant. Un séjour modifié dans le PMS peut apparaître à la fois comme « plus impayé » et comme « nouveau ».</p>';
+ }catch(err){$("cmpOut").innerHTML='<p class="note" style="color:var(--red)">Fichier illisible : '+esc(err.message)+'</p>'}};
+$("drop").onclick=()=>$("file").click();
+$("drop").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("file").click()}};
+$("file").onchange=e=>e.target.files[0]&&readFile(e.target.files[0]);
+["dragover","dragenter"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.add("over")}));
+["dragleave","drop"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.remove("over")}));
+$("drop").addEventListener("drop",e=>e.dataTransfer.files[0]&&readFile(e.dataTransfer.files[0]));
+$("demoBtn").onclick=()=>{$("rooms").value=40;if(!$("hotel").value)$("hotel").value="Hôtel démonstration";S.file="Données de démonstration";load(demoData())};
+$("rooms").onchange=()=>S.raw.length&&S.map.arrivee&&S.map.depart&&run();
+$("hotel").onchange=()=>{if(S.res)show(S.res);renderHist()};
+$("histClear").onclick=()=>{try{localStorage.removeItem(histKey())}catch(e){}renderHist()};
+$("printBtn").onclick=()=>window.print();
+$("csvBtn").onclick=exportCSV;
+$("expFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;
+ try{S.expRaw=await readRows(f,EXPF,/depense|charge|expense|cost/);if(!S.expRaw.length)throw new Error("fichier vide");renderExp()}
+ catch(err){$("expOut").innerHTML='<p class="note" style="color:var(--red)">Fichier illisible : '+esc(err.message)+'</p>'}};
+$("recFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;
+ try{const raw=await readRows(f,EXPF,/recette|revenu|produit|income|revenue|sales/);if(!raw.length)throw new Error("fichier vide");S.revList=parseLedger(raw);renderExp()}
+ catch(err){$("expOut").innerHTML='<p class="note" style="color:var(--red)">Fichier des recettes illisible : '+esc(err.message)+'</p>'}};
+["bi_tre","bi_sto","bi_imm","bi_four","bi_fisc","bi_emp","sim_pers","sim_aut"].forEach(id=>$(id).onchange=()=>renderExp());
+try{const sv=localStorage.getItem("rh-supmap");$("supmap").value=sv!==null?sv:DEFAULT_SUPMAP}catch(e){$("supmap").value=DEFAULT_SUPMAP}
+$("supmap").onchange=()=>{try{localStorage.setItem("rh-supmap",$("supmap").value)}catch(e){}renderExp()};
+$("xlsBtn").onclick=exportXLSX;
+$("unlockBtn").onclick=async()=>{
+ const v=$("code").value.trim();if(!v)return;
+ $("codeErr").style.color="var(--mute)";$("codeErr").textContent="Vérification…";
+ try{
+  const r=await fetch(CONFIG.supaUrl+"/rest/v1/rpc/verify_access_code",{method:"POST",headers:{"Content-Type":"application/json",apikey:CONFIG.supaKey,Authorization:"Bearer "+CONFIG.supaKey},body:JSON.stringify({p_code:v})});
+  const ok=r.ok&&(await r.json())===true;
+  if(ok){S.unlocked=true;$("codeErr").textContent="";drawAnomalies(S.res)}
+  else{$("codeErr").style.color="var(--red)";$("codeErr").textContent="Code incorrect ou expiré."}
+ }catch(e){$("codeErr").style.color="var(--red)";$("codeErr").textContent="Service momentanément indisponible. Contactez le consultant sur WhatsApp pour obtenir votre accès."}};
+/* ---------- Paiement automatique Orange Money ---------- */
+if(CONFIG.paiementAuto)$("omBox").classList.remove("hide");
+$("omPay").onclick=async()=>{
+ const m=$("omMsg");m.style.color="var(--mute)";m.textContent="Ouverture du paiement…";$("omPay").disabled=true;
+ try{
+  const r=await fetch("/api/create-order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({hotel:$("hotel").value.trim()})});
+  const j=await r.json();
+  if(!r.ok||!j.payment_url)throw new Error(j.error||"erreur");
+  try{localStorage.setItem("rh-order",j.id)}catch(e){}
+  location.href=j.payment_url;
+ }catch(e){$("omPay").disabled=false;m.style.color="var(--red)";m.textContent="Paiement indisponible pour le moment. Utilisez MVola ou Orange Money manuel ci-dessous."}};
+(function(){
+ let id=null;try{const q=new URLSearchParams(location.search);id=q.get("order")||(q.get("cancel")?null:null)}catch(e){}
+ if(!id)return;
+ const box=document.createElement("div");box.className="noprint";box.style.cssText="position:sticky;top:0;z-index:50;background:#0E1B3D;color:#fff;padding:12px 16px;font-size:15px;text-align:center";
+ box.textContent="Vérification de votre paiement…";document.body.prepend(box);
+ let n=0;const tick=async()=>{
+  try{
+   const r=await fetch("/api/order-status?id="+encodeURIComponent(id));const j=await r.json();
+   if(j.status==="paid"&&j.code){$("code").value=j.code;box.innerHTML="Paiement reçu ✔ Votre code d'accès : <b style=\"color:#E8C46A;letter-spacing:1px\">"+j.code+"</b><br>Notez-le, puis importez de nouveau votre fichier et appuyez sur « Débloquer ».";history.replaceState(null,"",location.pathname);return}
+   if(j.status==="paid"){box.textContent="Paiement reçu. Contactez le consultant sur WhatsApp pour obtenir votre code.";return}
+   if(j.status==="failed"||j.status==="expired"){box.textContent="Le paiement n'a pas abouti. Vous pouvez réessayer.";return}
+  }catch(e){}
+  if(++n<40)setTimeout(tick,3000);else box.textContent="Paiement en cours de confirmation. Si le code n'apparaît pas, contactez le consultant sur WhatsApp."};
+ tick();
+})();
+try{const g=localStorage.getItem("rh-grid");$("grid").value=g!==null?g:DEFAULT_GRID}catch(e){$("grid").value=DEFAULT_GRID}
+$("grid").onchange=()=>{try{localStorage.setItem("rh-grid",$("grid").value)}catch(e){}if(S.raw.length&&S.map.arrivee&&S.map.depart)run()};
+$("consultTag").textContent=CONFIG.consultant;
+</script>
+</body>
+</html>
